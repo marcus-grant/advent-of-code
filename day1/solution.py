@@ -38,6 +38,13 @@ with open("input.txt") as file:
             elf_num += 1
             print(f"Looking at Elf #{elf_num}'s backpack:")
 
+# Add the last summed calories of the last elf since the file loop ends early
+print(f"Elf #{elf_num} has {elf_calories_carried}\tcalories")
+print()
+elf_inventories.append(elf_calories_carried)
+
+print("Done checking each elf's backpack!")
+
 # Now with a list of elf carried calories, find the max
 elf_carrying_most_calories = 0
 elf_max_calories = elf_inventories[0]
@@ -57,3 +64,11 @@ print()
 print("========================================")
 print("The elf carrying the most calories is...")
 print(f"Elf #{elf_carrying_most_calories}, who has {elf_max_calories}calories.")
+
+### Part 2
+# To find the top 3 elves carrying the most calories, sort the elf inventories
+elf_inventories.sort(reverse=True)
+top_3_cals = elf_inventories[0] + elf_inventories[1] + elf_inventories[2]
+print()
+print("=== Part 2 ===")
+print(f"The top three elves are carrying {top_3_cals} calories")
