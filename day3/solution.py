@@ -1,66 +1,74 @@
 #!/usr/bin/env python3
 
-# Setup a list to hold all of the rock paper scissor round scores
-# Open file containing input for each elf inventory seprated by blank newline
-with open("day2/input.txt") as file:
-    # Set counters for...
-    # Each round's total score for the player vs opponent
+# Setup a list to hold all given rucksacks
+rucksacks = []
 
-    # Loop through each line in the file.
-    # Each one is either a number of calories or...
-    # ...a blank line w. only a newline to indicate end of an elf's inventory
-    player_total_score = 0
-    games_round_count = 0
+# Open file containing input for each elf rucksack seprated by blank newline
+with open("day3/input.txt") as file:
     for item in file:
-        # Current game round, removing all whitespace, including newline
-        current_round = item.split()
-        opponent_hand, player_hand = current_round[0], current_round[1]
-        print(f"Current round of matches is #{games_round_count}")
-        current_round_score = play_round(player_hand, opponent_hand)
-        game_scores.append(current_round_score)
-        player_total_score += current_round_score
-        games_round_count += 1
-        print(f"Player earns {current_round_score} points this round.")
-        print(f"Player has a total score of {player_total_score} points so far.")
         print()
+        # Split out the whitespace characters for each line including newline
+        # The result is a signle list representing each rucksack
+        rucksack = item.split()[0]
+        print(f"Current rucksack contains: {rucksack}")
 
+        # Split the rucksack evenly to represent each rucksack compartment
+        # ...but first check that the length of the rucksack is even
+        if len(rucksack) % 2 == 1:
+            # If it's odd, then something is wrong
+            print("ERROR: Something is wrong!")
+            print("Each compartment in the rucksack is supposed to have EXACTLY as many items.")
+            print("Skipping...")
+            break;
+        part1, part2 = (rucksack[:len(rucksack)//2], rucksack[len(rucksack)//2:])
+        print(f"part1: {part1}, part2: {part2}")
+        print(f"len1: {len(part1)}, len2: {len(part2)}")
+
+        # Add both compartments the rucksacks list
+        rucksacks.append((part1, part2))
+
+# Here are the rucksacks
+# print(rucksacks)
+
+# Define a function to find the duplicate item for each compartment of a rucksack
+def find_rucksack_duplicates(rucksack):
+    print(f"Current Rucksack: {rucksack}")
+    matched_items = []
+    for item0 in rucksack[0]:
+        # print(f"Looking for duplicates to item {item0} in compartment 0:")
+        for item1 in rucksack[1]:
+            # print(f"\tChecking {item1}, {'MATCHED' if item0 == item1 else  'UNMATCHED'}!")
+            if item0 == item1:
+                print(f"{item0} is in both compartments!")
+                matched_items.append(item0)
+    return matched_items
+
+# Create a priority score for each letter in order
+abc = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
+    'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
+ABC = list(map(lambda x: x.upper(), abc))
+priorities_list = [*abc, *ABC]
+
+# Loop through each comportment of each rucksack and find the duplicate items in each
+sum_of_priorities = 0
+# While adding up the sum of priorities of items to be reorganized that appear in both compartments
+for rucksack in rucksacks:
+    print()
+    duplicate_item = find_rucksack_duplicates(rucksack)[0]
+
+    # Get the index of the priorities_list to get the number of priority
+    priority = priorities_list.index(duplicate_item) + 1
+    print(f"Priority for item {duplicate_item} is {priority}")
+
+    # Sum the priority for each rucksack
+    sum_of_priorities += priority
+    print(f"Current sum of priorities: {sum_of_priorities}")
+
+print()
+print("=== Sum of Priorities ===")
+print(sum_of_priorities)
+print()
+
+
+        
 print("=== Part Two ===")
-
-def play_round_correctly(player_strat, opponent_hand):
-    match_points = PLAYER_SHOULD_EARN_THESE_POINTS[player_strat]
-    player_strat_str = PLAYER_STRAT_STR_DICT[player_strat]
-    opponent_hand_str = HAND_SIGN_STR_DICT[opponent_hand]
-    player_hand = PLAYER_STRAT_HAND_DICT[player_strat][opponent_hand]
-    player_hand_score = HAND_POINTS_DICT[player_hand]
-    player_hand_str = HAND_SIGN_STR_DICT[player_hand]
-    total_round_score = match_points + player_hand_score
-
-    print(f"Player should {player_strat_str} to {opponent_hand_str}, therefore...")
-    print(f"Player plays {player_hand_str}\t- Opponent plays {opponent_hand_str}")
-    print(f"Player earns {player_hand_score} points for playing {player_hand_str}")
-    print(f"Player earns {match_points} points for the {player_strat_str}")
-
-    return total_round_score
-
-
-# Open file containing input for each elf inventory seprated by blank newline
-with open("day2/input.txt") as file:
-    # Set counters for...
-    # Each round's total score for the player vs opponent
-
-    # Loop through each line in the file.
-    # Each one is either a number of calories or...
-    # ...a blank line w. only a newline to indicate end of an elf's inventory
-    player_total_score = 0
-    games_round_count = 0
-    for item in file:
-        # Current game round, removing all whitespace, including newline
-        current_round = item.split()
-        opponent_hand, player_strat = current_round[0], current_round[1]
-        print(f"Current round of matches is #{games_round_count}")
-        current_round_score = play_round_correctly(player_strat, opponent_hand)
-        player_total_score += current_round_score
-        games_round_count += 1
-        print(f"Player earns {current_round_score} points this round.")
-        print(f"Player has a total score of {player_total_score} points so far.")
-        print()

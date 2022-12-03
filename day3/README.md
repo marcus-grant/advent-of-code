@@ -60,9 +60,13 @@ both *compartments* of each rucksack is
 the sum of these is 157.
 
 Find the item type that appears in both *compartments* of each rucksack.
-What is the sum of the *priorities* of those item types?
+*What is the sum of the priorities of those item types?*
 
 To begin, get your puzzle input.
+
+Your puzzle answer was `8202`.
+
+**The first half of this puzzle is complete! It provides one gold star: ★**
 
 ## Part Two
 
