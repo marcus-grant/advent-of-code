@@ -72,3 +72,51 @@ print()
 
         
 print("=== Part Two ===")
+
+rucksack_groups = []
+rucksack_group = []
+for i in range(len(rucksacks)):
+    rucksack_group.append([*rucksacks[i][0], *rucksacks[i][1]])
+    if i % 3 == 2:
+        rucksack_groups.append(rucksack_group)
+        rucksack_group = []
+
+def find_duplicate_in_group(group):
+    duplicate = ''
+    # First loop through first rucksack of group
+    for item0 in group[0]:
+        print()
+        print(f"item0: {item0}")
+        for item1 in group[1]:
+            print(f"\titem1: {item1}")
+            if item0 != item1:
+                print(f"\t{item0} UNMATCHED with {item1}")
+                print("\tSkipping to next item")
+                continue
+            print(f"\t{item0} MATCHES {item1}")
+            print(f"\tChecking last rucksack of group using {item0}!")
+            for item2 in group[2]:
+                print(f"\t\titem2: {item2}")
+                if item1 != item2:
+                    print(f"\t\t{item1} UNMATCHED with {item2}")
+                    print("\t\tSkipping to next item")
+                    continue
+                print(f"\t\t{item1} MATCHES {item2}")
+                print("Found the duplicate!")
+                duplicate = item0
+    return duplicate
+                
+                
+
+
+# print all rucksack groups
+sum_of_priorities = 0
+for group in rucksack_groups:
+    print()
+    for rucksack in group:
+        print(rucksack)
+    duplicate = find_duplicate_in_group(group)
+    priority = priorities_list.index(duplicate) + 1
+    sum_of_priorities += priority
+
+print(f"Sum of priorities: {sum_of_priorities}")

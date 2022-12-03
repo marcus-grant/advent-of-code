@@ -122,10 +122,17 @@ their badge item type must be `Z`.
 Priorities for these items must still be found to
 organize the sticker attachment efforts: here,
 they are 18 (`r`) for the first group and 52 (`Z`) for the second group.
-The sum of these is 70.
+The sum of these is `70`.
 
 Find the item type that corresponds to the badges of each three-Elf group.
 *What is the sum of the priorities of those item types?*
+
+Your puzzle answers was: `2864`
+
+**The first half of this puzzle is complete! It provides one gold star: ★**
+
+You have completed Day 3! You can [Share][advent-share-mastodon] this victory or
+[Return to Your Advent Calendar][advent-code-22]
 
 ## References
 
