@@ -19,6 +19,13 @@ class CrateStack:
         self.count -= 1
         return popped_crate
     
+    def pop_multiple(self, amount):
+        popped_crates = []
+        for _ in range(amount):
+            popped_crates.append(self.pop())
+        popped_crates.reverse()
+        return popped_crates
+    
     def peek(self):
         res = self.stack[self.count - 1]
         return res
@@ -126,12 +133,13 @@ class CraneInstruction:
 # print(repr(crane_instruct))
 
 class CraneOperator:
-    def __init__(self, file_path):
+    def __init__(self, file_path, move_multiple_crates=False):
         self.file_path = file_path
         self.instructions = []
         self.num_instructions = 0
         crates_drawing_lines = []
         drawing_done = False
+        self.move_multiple_crates = move_multiple_crates
         try:
             with open(self.file_path) as file:
                 for line in file:
@@ -157,19 +165,35 @@ class CraneOperator:
         res = self.instructions[idx]
         return res;
     
-    def move_crates_with_instruction(self, instruction):
+    def move_single_crates(self, instruction):
         for _ in range(instruction.amount):
             src_stack = self.crate_stacks[instruction.src_stack]
             dst_stack = self.crate_stacks[instruction.dst_stack]
             popped_crate = src_stack.pop()
             dst_stack.push(popped_crate)
     
-    def move_crates_till_instruction_num(self, instruction_num=None, debug=False):
+    def move_multiple_crates_with_instructions(self, debug=False):
+        for instruction in self.instructions:
+            src = instruction.src_stack
+            dst = instruction.dst_stack
+            amount = instruction.amount
+            popped_crates = self.crate_stacks[src].pop_multiple(amount)
+            for crate in popped_crates:
+                self.crate_stacks[dst].push(crate)
+            if debug:
+                print()
+                print(instruction)
+                print('======================')
+                print(self.crate_stacks)
+    
+    def move_crates_till_instruction_num(self,
+                                            instruction_num=None,
+                                            debug=False):
         if not instruction_num:
             instruction_num = self.num_instructions
         for instruction_idx in range(instruction_num):
             instruction = self.instructions[instruction_idx]
-            self.move_crates_with_instruction(instruction)
+            self.move_single_crates(instruction)
             if debug:
                 print()
                 print(instruction)
@@ -205,4 +229,17 @@ print('=======================================')
 tops_of_stacks = op.peek_all_stacks()
 print(tops_of_stacks)
 
+print()
+print("Time to execute all crane move operations (this time with multiple crates)")
+print("Current State of Stacks")
+print("=======================")
+print(op.crate_stacks)
+op = CraneOperator('day5/input.txt')
+op.move_multiple_crates_with_instructions(debug=True)
+
+print()
+print('The tops of every stack (in order) are:')
+print('=======================================')
+tops_of_stacks = op.peek_all_stacks()
+print(tops_of_stacks)
 
