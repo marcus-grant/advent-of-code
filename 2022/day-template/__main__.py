@@ -4,12 +4,12 @@ import pathlib
 import os
 from rich import print
 from solver import Solver
-
+    
 if __name__ == '__main__':
 
     year = '2022'
     day = pathlib.Path(__file__).parent.name[3:]
-    dir = pathlib.Path(__file__).parent.absolute
+    parent_dir = pathlib.Path(__file__).parent
 
     ICON_PASS = "\U00002705"
     ICON_FAIL = "\U0000274C"
@@ -18,7 +18,8 @@ if __name__ == '__main__':
     print(f"Python {platform.python_version}\n")
 
     try:
-        test_input = open(os.path.join(dir, 'test.txt')).read()
+        test_file = os.path.join(parent_dir, 'test.txt')
+        test_input = open(test_file).read()
         s = Solver(test_input, True)
         s.solve()
         print(
@@ -42,7 +43,7 @@ if __name__ == '__main__':
         sys.exit()
     
     try:
-        challenge_input = open(os.path.join(dir, 'input.txt')).read()
+        challenge_input = open(os.path.join(parent_dir, 'input.txt')).read()
     except FileNotFoundError:
         print('Error: could not open or read input.tx')
         sys.exit(-1)
