@@ -23,7 +23,8 @@ Your puzzle answer was `SOME_ANSWER HERE IN CODE SPAN`.
 
 **The second half of this puzzle is complete! That's two gold stars in total!: ★**
 
-You have completed Day 5! You can [Share][advent-share-mastodon] this victory or
+<!-- TODO: Make sure you replace the X here with the current day -->
+You have completed Day X! You can [Share][advent-share-mastodon] this victory or
 [Return to Your Advent Calendar][advent-code-22]
 
 ## References
