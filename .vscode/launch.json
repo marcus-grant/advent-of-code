@@ -1,0 +1,15 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Advent of Code 2022 Day 6",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}//2022//day06",
+            "justMyCode": true
+        }
+    ]
+}
