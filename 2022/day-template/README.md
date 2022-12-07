@@ -2,7 +2,9 @@
 
 <!-- TODO: ENSURE YOUVE REPLACED X WITH DAY NUMBER IN LINKS BELOW -->
 *From [Advent of Code][advent-code-22]*
-*And from [Day X][advent-code-22-day-X]*
+*For [Day X of Year 2022][advent-code-22-day-X]*
+
+## Part One
 
 <!-- BEGIN PASTED INSTRUCTIONS -->
 <!-- END PASTED INSTRUCTIONS -->
