@@ -1,0 +1,8 @@
+{
+    "write-good.write-good-config": {
+        "adverb": false,
+        "passive": false,
+        "tooWordy": false,
+        "weasel": false
+    }
+}
