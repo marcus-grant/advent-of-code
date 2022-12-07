@@ -10,6 +10,13 @@
             "request": "launch",
             "program": "${workspaceFolder}//2022//day06",
             "justMyCode": true
+        },
+        {
+            "name": "Advent of Code 2022 Day 7",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}//2022//day07",
+            "justMyCode": true
         }
     ]
 }
