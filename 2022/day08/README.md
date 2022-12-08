@@ -69,7 +69,10 @@ Consider your map;
 
 To begin, [get your puzzle input][advent-code-22-day8-input].
 
-Your puzzle answer was `SOME_ANSWER_HERE_IN_CODE_SPAN`.
+Your puzzle answer was `1829`.
+
+That's the right answer! You are **one gold star closer** to collecting enough star fruit.
+[Continue to Part Two]
 
 **The first half of this puzzle is complete! It provides one gold star: ★**
 
@@ -93,6 +96,7 @@ You have completed Day 8! You can [Share][advent-share-mastodon] this victory or
 - [Tree House (from Wikipedia, the free encyclopedia)][treehouse-wiki]
 - [Quadcopter (from Wikipedia, the free encyclopedia)][quadcopter-wiki]
 - [Advent of Code 2022 Day 8 Input][advent-code-22-day8-input]
+- [Advent of Code 2022 Day 8 Part 2][advent-code-22-day8-part2]
 
 <!-- Hidden Reference Links Below Here -->
 [advent-code-22]: https://adventofcode.com/2022 "Advent of Code 2022"
@@ -101,3 +105,4 @@ You have completed Day 8! You can [Share][advent-share-mastodon] this victory or
 [treehouse-wiki]: https://en.wikipedia.org/wiki/Tree_house "Tree House (from Wikipedia, the free encyclopedia)"
 [quadcopter-wiki]: https://en.wikipedia.org/wiki/Quadcopter "Quadcopter (from Wikipedia, the free encyclopedia)"
 [advent-code-22-day8-input]: https://adventofcode.com/2022/day/8/input "Advent of Code 2022 Day 8 Input"
+[advent-code-22-day8-part2]: https://adventofcode.com/2022/day/8#part2 "Advent of Code 2022 Day 8 Part 2"
