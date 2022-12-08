@@ -6,7 +6,7 @@ class Solver:
         self.parse(input_str)
         self.is_test = is_test
         self.test1 = 21
-        self.test2 = None
+        self.test2 = 8
         self.part1 = 0
         self.part2 = 0
     
@@ -67,9 +67,9 @@ class Solver:
         # If the tree is visible in no axis, it's not visible somewhere
         return False
 
-
-
     def solve(self):
+        ### Part 1 ###
+
         visible_inner_trees = 0
         trees_shape = self.data.shape
         # Loop through every tree cell row/col index of INNER trees
@@ -81,3 +81,5 @@ class Solver:
         
         edge_trees_count = 2 * ((trees_shape[0] - 1) + (trees_shape[1] - 1))
         self.part1 = visible_inner_trees + edge_trees_count
+
+        ### Part 2 ###
