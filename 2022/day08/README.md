@@ -144,7 +144,7 @@ this is the ideal spot for the tree house.
 Consider each tree on your map.
 *What is the highest scenic score possible for any tree?*
 
-Your puzzle answer was `SOME_ANSWER HERE IN CODE SPAN`.
+Your puzzle answer was `291840`.
 
 **The second half of this puzzle is complete! That's two gold stars in total!: ★**
 
