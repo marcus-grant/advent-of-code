@@ -1,15 +1,30 @@
 import os
 import argparse
 
+def get_day_str(day: int) -> str:
+    if not isinstance(day, int) or day < 1 or day > 25:
+        raise ValueError(f"Invalid day. Day must be in between 1~25. Got {day}")
+    return f"{day:02d}"
+
 def create_day_dir(day: int) -> None:
     if not isinstance(day, int) or day < 1 or day > 25:
         raise ValueError(f"Invalid day. Day must be in between 1~25. Got {day}")
 
-    dir_name = f"{day:02d}"
+    dir_name = f"{get_day_str(day)}"
     os.makedirs(dir_name, exist_ok=True)
 
+def get_day_url(day: int) -> str:
+    if not isinstance(day, int) or day < 1 or day > 25:
+        raise ValueError(f"Invalid day. Day must be in between 1~25. Got {day}")
+    return f"https://adventofcode.com/2023/day/{day}"
+
+def get_day_input_url(day: int) -> str:
+    if not isinstance(day, int) or day < 1 or day > 25:
+        raise ValueError(f"Invalid day. Day must be in between 1~25. Got {day}")
+    return f"https://adventofcode.com/2023/day/{day}/input"
+
 def create_readme(day: int, title: str) -> None:
-    day_str = f"{day:02d}"
+    day_str = f"{get_day_str(day)}"
     content = f"# Day {day_str} - {title}\n\n"
     content += "## Part One\n\n"
     content += "TODO: Add example one description for Part One.\n\n"
@@ -27,8 +42,8 @@ def create_readme(day: int, title: str) -> None:
     content += '\n'
     content += f"<!-- Hidden References -->\n"
     content += f"[aoc-calendar]: https://adventofcode.com/2023 \"Advent of Code - Calendar\"\n"
-    content += f"[aoc-day{day}]: https://adventofcode.com/2023/day/{day} \"Advent of Code - Day {day_str}\"\n"
-    content += f"[aoc-day{day}-input]: https://adventofcode.com/2023/day/{day}/input \"Advent of Code - Day {day_str} - Input\"\n"
+    content += f"[aoc-day{day}]: {get_day_url(day)} \"Advent of Code - Day {day_str}\"\n"
+    content += f"[aoc-day{day}-input]: {get_day_input_url(day)} \"Advent of Code - Day {day_str} - Input\"\n"
     
     with open(f"{day_str}/README.md", "w") as readme_file:
         readme_file.write(content)
@@ -96,7 +111,8 @@ def create_solve(day: int, title: str = '') -> None:
     ss.append('    # TODO: Implement Part Two Input')
     ss.append('')
     ss.append('if __name__ == "__main__":')
-    title = f" Day {day:02d} - {title} " 
+    day_str = get_day_str(day)
+    title = f" Day {day_str} - {title} " 
     left_pad = (64 - len(title)) // 2
     right_pad = 64 - len(title) - left_pad
     left_pad = left_pad * "="
@@ -104,7 +120,7 @@ def create_solve(day: int, title: str = '') -> None:
     ts = left_pad + title + right_pad
     ss.append(f"    print('{ts}')")
     ss.append('    main()')
-    title = f" Day {day:02d} - Complete "
+    title = f" Day {day_str} - Complete "
     left_pad = (64 - len(title)) // 2
     right_pad = 64 - len(title) - left_pad
     left_pad = left_pad * "="
@@ -113,15 +129,26 @@ def create_solve(day: int, title: str = '') -> None:
     ss.append(f"    print('{ts}')")
     ss.append('')
     ss = [s + '\n' for s in ss]
-    with open(f"{day:02d}/solve.py", "w") as solve_file:
+    with open(f"{day_str}/solve.py", "w") as solve_file:
         solve_file.writelines(ss)
 
+def create_input_file(day: int) -> None:
+    day_str = f"{get_day_str(day)}"
+    content = f"TODO: Copy input data from {get_day_input_url(day)} ."
+    with open(f"{day_str}/input.txt", "w") as input_file:
+        input_file.write(content)
+    
+def create_example_file(day: int) -> None:
+    day_str = f"{get_day_str(day)}"
+    content = f"TODO: Copy example data from {get_day_url(day)} ."
+    with open(f"{day_str}/example.txt", "w") as input_file:
+        input_file.write(content)
     
 # https://adventofcode.com/2023/day/3
 def create_all_day_templates(day: int, title: str) -> None:
     if not isinstance(day, int) or day < 1 or day > 25:
         raise ValueError(f"Invalid day. Day must be in between 1~25. Got {day}")
-    day_str = f"{day:02d}"
+    day_str = f"{get_day_str(day)}"
     print(f"Creating files & directories for Advent of Code!")
     print(f"Day {day_str} - {title}")
     print(f"First creating directory {day_str}")
@@ -135,6 +162,12 @@ def create_all_day_templates(day: int, title: str) -> None:
     print('Done!')
     print(f"Creating solve.py file for day {day_str}.")
     create_solve(day)
+    print('Done!')
+    print(f"Creating input.txt file for day {day_str}.")
+    create_input_file(day)
+    print('Done!')
+    print(f"Creating example.txt file for day {day_str}.")
+    create_example_file(day)
     print('Done!')
 
 if __name__ == '__main__':
