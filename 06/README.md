@@ -114,27 +114,52 @@ you get *`288`* (`4` * `8` * `9`).
 Determine the number of ways you could beat the record in each race.
 *What do you get if you multiply these numbers together?*
 
-**Your puzzle answer was `PLACEHOLDER FOR VERIFIED INPUT ANSWER`**.
+Your puzzle answer was `2612736`.
+
+**The first half of this puzzle is complete! It provides one gold star: \***
 
 ## Part Two
 
-***PLACEHOLDER FOR TEXT BEFORE EXAMPLE***
+As the race is about to start,
+you realize the piece of paper with
+race times and record distances you got earlier
+actually just has very bad [kerning][wiki-kerning].
+There's really *only one race* -
+ignore the spaces between the numbers on each line.
+
+**So for the example from before:**
 
 ```txt
-GO TO URL BELOW, COPY SECOND EXAMPLE TEXT, AND PASTE HERE
-https://adventofcode.com/2023/day/6
+Time:      7  15   30
+Distance:  9  40  200
 ```
 
-***PLACEHOLDER FOR TEXT AFTER EXAMPLE***
+**...now instead means this:**
 
-Your puzzle answer was *`PLACEHOLDER FOR VERIFIED INPUT ANSWER`*.
+```txt
+Time:      71530
+Distance:  940200
+```
 
-**Both parts of this puzzle are complete!
-They provide two gold stars: \*\***
+Now, you have to figure out how many ways there are to win this single race.
+In this example,
+the race lasts for *`71530` milliseconds* and
+the record distance you need to beat is *`940200` millimeters*.
+You could hold the button anywhere
+from `14` to `71516` milliseconds and beat the record,
+a total of *`71503`* ways!
+
+*How many ways can you beat the record in this one much longer race?*
+
+Your puzzle answer was `29891250`.
+
+**Both parts of this puzzle are complete! They provide two gold stars: \*\***
 
 At this point,
 you should [return to your Advent calendar][aoc-calendar] and
 try another puzzle.
+
+If you still want to see it, you can get your [puzzle input][aoc-day06-input].
 
 If you still want to see it,
 you can [get your puzzle input][aoc-day06-input].
@@ -145,8 +170,10 @@ you can [get your puzzle input][aoc-day06-input].
 - [Advent of Code - 2023 - Calendar][aoc-calendar]
 - [Advent of Code - Day 06 - Wait For It][aoc-day06]
 - [Advent of Code - Day 06 - Input][aoc-day06-input]
+- [Wikipedia - Kerning][wiki-kerning]
 
 <!-- Hidden References -->
 [aoc-calendar]: https://adventofcode.com/2023 "Advent of Code - Year/Calendar"
 [aoc-day06]: https://adventofcode.com/2023/day/6 "Advent of Code - Day 06"
 [aoc-day06-input]: https://adventofcode.com/2023/day/6/input "Advent of Code - Day 04 - Input"
+[wiki-kerning]: https://en.wikipedia.org/wiki/Kerning "Wikipedia - Kerning"

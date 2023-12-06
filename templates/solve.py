@@ -1,5 +1,6 @@
 import attrs
 import dataclasses
+import math
 from rich import print as rprint
 from rich import console
 import rich
@@ -69,4 +70,4 @@ def main():
 if __name__ == "__main__":
     print('==================== Day {{ day_str }} - {{ day_title }} =====================')
     main()
-    print('====================== Day 04 - Complete =======================')
+    print('====================== Day {{ day_str }} - Complete =======================')
