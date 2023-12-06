@@ -40,29 +40,29 @@ def main():
     solution = part1(EXAMPLE)
     print_solution(f"{solution}", title="Part One (Example)")
 
-    print()
-    print("Part One - Input")
-    print("================")
+    # print()
+    # print("Part One - Input")
+    # print("================")
 
-    print()
-    solution = part1(INPUT)
-    print_solution(f"{solution}", title="Part One (INPUT)")
+    # print()
+    # solution = part1(INPUT)
+    # print_solution(f"{solution}", title="Part One (INPUT)")
 
-    print()
-    print("Part Two - Example")
-    print("==================")
+    # print()
+    # print("Part Two - Example")
+    # print("==================")
 
-    print()
-    solution = part2(EXAMPLE)
-    print_solution(f"{solution}", title="Part Two (Example)")
+    # print()
+    # solution = part2(EXAMPLE)
+    # print_solution(f"{solution}", title="Part Two (Example)")
 
-    print()
-    print("Part Two - Input")
-    print("================")
+    # print()
+    # print("Part Two - Input")
+    # print("================")
 
-    print()
-    solution = part2(INPUT)
-    print_solution(f"{solution}", title="Part Two (Example)")
+    # print()
+    # solution = part2(INPUT)
+    # print_solution(f"{solution}", title="Part Two (Example)")
     print()
 
 
