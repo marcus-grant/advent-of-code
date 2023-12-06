@@ -1,5 +1,6 @@
 # The AOC devs have asked people not to show the input
 **/input.txt
+**/alt.py
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

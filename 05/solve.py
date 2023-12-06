@@ -98,7 +98,35 @@ def part1(input_file: str) -> int:
 
 def part2(input_file: str) -> int:
     lines = read_input(input_file)
-    return 0
+
+    rprint('[cyan]Here are all the seeds:[/cyan]')
+    print()
+    seed_pairs = [int(s) for s in lines[0].split(" ")[1:] if s != ""]
+    seed_pairs = [(int(seed_pairs[i]), int(seed_pairs[i+1]))
+                  for i in range(0, len(seed_pairs), 2)]
+    # each seed pair tuple defines the first seed number and
+    # the second the number of consecutive seed numbers
+    seeds = []
+    for seed, n in seed_pairs:
+        seeds.extend(range(seed, seed+n))
+    console.print(seeds, style="bold green")
+
+    print()
+    console.print('[cyan]Here is the table of all maps:[/cyan]' )
+    print()
+    maps = parse_maps(lines)
+    print_maps_table(maps)
+
+    print()
+    rprint('[cyan]Here are all the mapped seed -> locations:[/cyan]')
+    print()
+    seed_locations = [(s, map_seed_to_location(s, maps)) for s in seeds]
+    for s, loc in seed_locations:
+        console.print(f"[bold][red]{s}[/red] -> [green]{loc}[/green][/bold]")
+    print()
+
+    print()
+    return min([loc for _, loc in seed_locations])
 
 def main():
     EXAMPLE = "05/example.txt"
@@ -125,55 +153,16 @@ def main():
     print("==================")
 
     print()
-    # TODO: Implement Part Two Example
+    solution = part2(EXAMPLE)
+    print_solution(f"{solution}", title="Part Two (Example)")
 
     print()
     print("Part Two - Input")
     print("================")
 
     print()
-    # TODO: Implement Part Two Input
-
-def alt():
-    with open("05/example.txt") as fin:
-        lines = fin.read().strip().split("\n")
-
-    seeds = list(map(int, lines[0].split(" ")[1:]))
-
-    # Generate all the mappings
-    maps = []
-
-    i = 2
-    while i < len(lines):
-        maps.append([])
-
-        i += 1
-        while i < len(lines) and not lines[i] == "":
-            dstStart, srcStart, rangeLen = map(int, lines[i].split())
-            maps[-1].append((dstStart, srcStart, rangeLen))
-            i += 1
-
-        i += 1
-
-
-    def findLoc(seed):
-        curNum = seed
-
-        for m in maps:
-            for dstStart, srcStart, rangeLen in m:
-                if srcStart <= curNum < srcStart + rangeLen:
-                    curNum = dstStart + (curNum - srcStart)
-                    break
-
-        return curNum
-
-
-    locs = []
-    for seed in seeds:
-        loc = findLoc(seed)
-        locs.append(loc)
-
-    print(min(locs))
+    solution = part2(INPUT)
+    print_solution(f"{solution}", title="Part Two (INPUT)")
 
 if __name__ == "__main__":
     print('========================== Day 05 -  ===========================')
