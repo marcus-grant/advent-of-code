@@ -64,8 +64,8 @@ def main():
         
 
 if __name__ == "__main__":
-    DAY = "{{ day_str }}"
-    DAY_TITLE = "{{ day_title }}"
+    DAY = "08"
+    DAY_TITLE = "Haunted Wasteland"
     msg = f"[bold green]Advent of Code - Day {DAY} - {DAY_TITLE}[/bold green]" 
     print_panel(msg ,style="bold red")
     main()

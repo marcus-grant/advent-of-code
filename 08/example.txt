@@ -1,0 +1,3 @@
+!!! GO TO THE BELOW URL, highlight the example block's text & copy !!!
+https://adventofcode.com/2023/day/8
+!!! SELECT ALL TEXT IN THIS FILE, THEN PASTE, THEN SAVE !!!
