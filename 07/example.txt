@@ -1,3 +1,5 @@
-!!! GO TO THE BELOW URL, highlight the example block's text & copy !!!
-https://adventofcode.com/2023/day/7
-!!! SELECT ALL TEXT IN THIS FILE, THEN PASTE, THEN SAVE !!!
+32T3K 765
+T55J5 684
+KK677 28
+KTJJT 220
+QQQJA 483
