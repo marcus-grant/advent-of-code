@@ -1,3 +1,4 @@
+# Just setup for a nicer solving experience
 import argparse
 from rich import print as rprint
 from rich import console
@@ -26,6 +27,7 @@ def read_lines(input_file_path: str) -> list[str]:
         lines = f.read().splitlines()
     return lines
 
+# Real work starts here
 def successive_diffs(series: list[int]) -> list[list[int]]:
     diffed = series # Start with differential order of 0 ie no diff
     res = [diffed]
@@ -83,6 +85,7 @@ def part2(f: str, verbose) -> int:
 
     return sum([d[0][0] for d in all_diffs_interp])
 
+# Real work ends here, this just sets up solution order
 def main(verbose: bool=True):
     EXAMPLE = f"{DAY}/example.txt"
     INPUT = f"{DAY}/input.txt"
