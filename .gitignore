@@ -2,6 +2,8 @@
 **/input.txt
 !templates/input.txt
 **/alt.py
+# Also, don't show cookie
+.token.txt
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
