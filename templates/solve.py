@@ -1,5 +1,6 @@
 import attrs
 import dataclasses
+import numpy as np
 import math
 from rich import print as rprint
 from rich import console
@@ -25,18 +26,18 @@ def print_panel(msg: str, title: str="",
     panel = rich.panel.Panel.fit(msg, title=title, style=style)
     cprint(panel, justify=justify, new_line_start=True)
 
-def read_input_lines(input_file_path: str) -> list[str]:
-    with open(input_file_path, "r") as f:
+def read_lines(fpath: str) -> list[str]:
+    with open(fpath, "r") as f:
         lines = f.read().splitlines()
     return lines
 
-def part1(input_file: str) -> int:
-    lines = read_input_lines(input_file)
+def part1(fpath: str) -> int:
+    lines = read_lines(fpath)
 
     return 0
 
-def part2(input_file: str) -> int:
-    lines = read_input_lines(input_file)
+def part2(fpath: str) -> int:
+    lines = read_lines(fpath)
 
     return 0
 
