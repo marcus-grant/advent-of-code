@@ -1,9 +1,10 @@
+import argparse
 import attrs
 import dataclasses
 import numpy as np
 import math
 from rich import print as rprint
-from rich import console
+from rich import console, rule
 import rich
 import re
 import time
@@ -67,8 +68,16 @@ def main():
 if __name__ == "__main__":
     DAY = "{{ day_str }}"
     DAY_TITLE = "{{ day_title }}"
-    msg = f"[bold green]Advent of Code - Day {DAY} - {DAY_TITLE}[/bold green]" 
-    print_panel(msg ,style="bold red")
-    main()
-    msg = f"[bold red]Advent of Code - Day {DAY} - Complete![/bold red]" 
-    print_panel(msg, style="bold green")
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--quiet", "-q",
+        action="store_true",
+        help="Don't print debug lines of anything to the console")
+    args = parser.parse_args()
+    # msg = f"[bold green]Advent of Code - Day {DAY} - {DAY_TITLE}[/bold green]" 
+    cprint(rule.Rule(title=f"Advent of Code - Day {DAY} - {DAY_TITLE}"), style="red")
+    # print_panel(msg ,style="bold red")
+    main(args)
+    # msg = f"[bold red]Advent of Code - Day {DAY} - Complete![/bold red]" 
+    # print_panel(msg, style="bold green")
+    cprint(rule.Rule(title=f"Advent of Code - Day {DAY} - Complete!"), style="red")
