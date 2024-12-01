@@ -1,3 +1,6 @@
+# Don't share your AoC token
+*.token.txt
+
 .venv/
 **/venv/
 
