@@ -70,7 +70,23 @@ def read_lines(fpath: str) -> list[str]:
 def part1(fpath: str) -> int:
     lines = read_lines(fpath)
 
-    return 0
+    # Create the list1 & list2 for the 1st/2nd lists
+    # if line.strip() is used to remove any empty lines
+    # line.split takes either the left or right of the whitespace
+    left = [int(line.split()[0]) for line in lines if line.strip()]
+    right = [int(line.split()[1]) for line in lines if line.strip()]
+
+    # Now as per the problem, sort each list ascending
+    left = sorted(left)
+    right = sorted(right)
+
+    # Now we get the difference between the two
+    diff = [abs(l - r) for l, r in zip(left, right)]
+
+    # Part1's answer is the sum of differences
+    answer = sum(diff)
+
+    return answer
 
 
 def part2(fpath: str) -> int:
@@ -85,7 +101,7 @@ def main(args):
     TITLES = [  # Toggle these to control which parts of the code are run
         "Part One - EXAMPLE",
         # NOTE: Uncomment these lines when ready to try real input or next part
-        # "Part One - INPUT",
+        "Part One - INPUT",
         # "Part Two - EXAMPLE",
         # "Part Two - INPUT",
     ]
@@ -104,8 +120,8 @@ def main(args):
 
 
 if __name__ == "__main__":
-    DAY = "{{ day_str }}"
-    DAY_TITLE = "{{ day_title }}"
+    DAY = "01"
+    DAY_TITLE = "Historian Hysteria"
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--quiet",
