@@ -1,5 +1,6 @@
 # Don't share your AoC token
 *.token.txt
+*input.txt
 
 .venv/
 **/venv/
