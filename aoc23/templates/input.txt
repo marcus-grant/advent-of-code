@@ -1,0 +1,3 @@
+!!! GO TO THE BELOW URL, select ALL input text & copy !!!
+{{ day_url_input }}
+!!! SELECT ALL TEXT IN THIS FILE, THEN PASTE, THEN SAVE !!!
