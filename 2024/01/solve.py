@@ -92,7 +92,27 @@ def part1(fpath: str) -> int:
 def part2(fpath: str) -> int:
     lines = read_lines(fpath)
 
-    return 0
+    # First parse the left and right lists of numbers
+    left = [int(line.split()[0]) for line in lines if line.strip()]
+    right = [int(line.split()[1]) for line in lines if line.strip()]
+
+    # The left number for each row needs counting for occurrences on right list
+    # Therefore it makes more sense to create a counting dictionary of the right
+    right_counts = {}
+    for x in right:
+        if x not in right_counts:
+            right_counts[x] = 1
+        else:
+            right_counts[x] += 1
+
+    # For each left number, multiply its value by
+    # that number's count in the right list
+    answer = 0
+    for x in left:
+        if x in right_counts:
+            answer += right_counts[x] * x
+
+    return answer
 
 
 def main(args):
@@ -102,8 +122,8 @@ def main(args):
         "Part One - EXAMPLE",
         # NOTE: Uncomment these lines when ready to try real input or next part
         "Part One - INPUT",
-        # "Part Two - EXAMPLE",
-        # "Part Two - INPUT",
+        "Part Two - EXAMPLE",
+        "Part Two - INPUT",
     ]
     for t in TITLES:
         print_panel(t, style="bold green")
