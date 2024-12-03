@@ -16,49 +16,9 @@ from typing import Optional, List, Tuple, Dict, Union, Literal, NewType
 console = Console()
 cprint = console.print
 
-
-def print_solution(
-    sol: str,
-    title: str = "",
-    style: str = "bold red",
-    justify: Literal["center", "left", "right"] = "center",
-) -> None:
-    # Construct the title message with conditional formatting
-    if title:
-        msg = f"[bold green]Solution to {title}[/bold green]"
-    else:
-        msg = "[bold green]Solution[/bold green]"
-
-    # Create a Rich Panel with the solution text
-    panel = Panel.fit(
-        sol,
-        title=msg,
-        style=style,
-        border_style=style,
-        padding=(1, 2),  # Optional: Adds padding for better aesthetics
-    )
-    # Print the panel with specified justification
-    cprint(panel, justify=justify, new_line_start=True)
-
-
-def print_panel(
-    msg: str,
-    title: str = "",
-    style: str = "yellow",
-    justify: Literal["left", "center", "right"] = "center",
-) -> None:
-    """
-    Print a styled panel using Rich.
-
-    Args:
-        msg (str): The message to display inside the panel.
-        title (str, optional): The title of the panel. Defaults to "".
-        style (str, optional): The style of the panel. Defaults to "yellow".
-        justify (Literal["left", "center", "right"], optional): Text justification. Defaults to "center".
-    """
-    panel_title = title if title else None
-    panel = Panel.fit(msg, title=panel_title, style=style)
-    cprint(panel, justify=justify, new_line_start=True)
+# Solver ID Constants
+DAY: str = "01"
+TITLE: str = "Historian Hysteria"
 
 
 def read_lines(fpath: str) -> list[str]:
@@ -67,7 +27,8 @@ def read_lines(fpath: str) -> list[str]:
     return lines
 
 
-def part1(fpath: str) -> int:
+def part1(fpath: str, debug: bool = False) -> int:
+    debug = False if debug is None else debug
     lines = read_lines(fpath)
 
     # Create the list1 & list2 for the 1st/2nd lists
@@ -89,7 +50,7 @@ def part1(fpath: str) -> int:
     return answer
 
 
-def part2(fpath: str) -> int:
+def part2(fpath: str, debug: bool = False) -> int:
     lines = read_lines(fpath)
 
     # First parse the left and right lists of numbers
