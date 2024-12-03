@@ -1,0 +1,42 @@
+#!/usr/bin/env .venv/bin/python
+# aoc.py
+import argparse
+from argparse import ArgumentParser
+import sys
+
+import cmd.solve as day_solver
+
+from util.sols import cprint
+
+
+def main():
+    parser = argparse.ArgumentParser(description="AOC Runner Script")
+
+    # Create subparsers for subcommands
+    subparsers = parser.add_subparsers(
+        title="subcommands", description="valid subcommands", dest="command"
+    )
+    subparsers.required = True  # Make subcommand required
+
+    # Define available subcommands
+    subparsers.add_parser("solve", help="Solve a problem")
+
+    # Parse only the first two arguments (script name and subcommand)
+    if len(sys.argv) < 2:
+        parser.print_help()
+        sys.exit(1)
+
+    # Parse known arguments to identify the subcommand
+    args, remaining_args = parser.parse_known_args()
+
+    # Identify the subcommand to run the right main
+    if args.command == "solve":
+        day_solver.main(remaining_args)
+        sys.exit(0)
+
+    cprint("Invalid subcommand", style="bold red")
+    exit(1)
+
+
+if __name__ == "__main__":
+    main()
