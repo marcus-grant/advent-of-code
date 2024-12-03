@@ -17,3 +17,84 @@ pip-delete-this-directory.txt
 *.coverage
 *.coverage.*
 *.cache
+
+# Rust parts
+# Cargo's build output directory
+**/target/
+
+# Uncomment the following line if you want to ignore Cargo.lock for library projects
+# For binary projects, it's recommended to commit Cargo.lock
+# Cargo.lock
+
+# =====================
+# Backup Files
+# =====================
+
+# Backup files created by rustfmt
+**/*.rs.bk
+
+# Temporary files created by editors
+*~
+\#*\#
+.\#*
+
+# =====================
+# IDEs and Editors
+# =====================
+
+# IntelliJ IDEA / CLion
+.idea/
+
+# Visual Studio Code
+.vscode/
+
+# Emacs
+*~
+
+# Vim swap files
+*.swp
+
+# Sublime Text
+*.sublime-workspace
+*.sublime-project
+
+# =====================
+# Operating System Files
+# =====================
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+Desktop.ini
+Icon?
+ehthumbs.db
+
+# Linux
+*~
+
+# =====================
+# Other Tools
+# =====================
+
+# Generated documentation
+/doc/
+
+# =====================
+# Logs and Databases
+# =====================
+
+# Log files
+*.log
+
+# SQLite databases
+*.sqlite
+
+# =====================
+# Custom Exclusions
+# =====================
+
+# Add any additional directories or files you want to ignore below this line
+# For example:
+# /path/to/ignored/file_or_directory/
