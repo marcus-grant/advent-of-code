@@ -4,7 +4,6 @@
 # import math
 # import re
 # import time
-import argparse
 import numpy as np
 from rich import print as rprint
 from rich.console import Console
@@ -54,7 +53,8 @@ def print_panel(
         msg (str): The message to display inside the panel.
         title (str, optional): The title of the panel. Defaults to "".
         style (str, optional): The style of the panel. Defaults to "yellow".
-        justify (Literal["left", "center", "right"], optional): Text justification. Defaults to "center".
+        justify (Literal["left", "center", "right"], optional):
+            Text justification. Defaults to "center".
     """
     panel_title = title if title else None
     panel = Panel.fit(msg, title=panel_title, style=style)
@@ -79,9 +79,9 @@ def part2(fpath: str) -> int:
     return 0
 
 
-def main(args):
-    EXAMPLE = f"{DAY}/example.txt"
-    INPUT = f"{DAY}/input.txt"
+def main(day_str: str) -> None:
+    EXAMPLE = f"{day_str}/example.txt"
+    INPUT = f"{day_str}/input.txt"
     TITLES = [  # Toggle these to control which parts of the code are run
         "Part One - EXAMPLE",
         # NOTE: Uncomment these lines when ready to try real input or next part
@@ -104,6 +104,8 @@ def main(args):
 
 
 if __name__ == "__main__":
+    import argparse
+
     DAY = "{{ day_str }}"
     DAY_TITLE = "{{ day_title }}"
     parser = argparse.ArgumentParser()
@@ -117,7 +119,7 @@ if __name__ == "__main__":
     # msg = f"[bold green]Advent of Code - Day {DAY} - {DAY_TITLE}[/bold green]"
     cprint(rule.Rule(title=f"Advent of Code - Day {DAY} - {DAY_TITLE}"), style="red")
     # print_panel(msg ,style="bold red")
-    main(args)
+    main(DAY)
     # msg = f"[bold red]Advent of Code - Day {DAY} - Complete![/bold red]"
     # print_panel(msg, style="bold green")
     cprint(rule.Rule(title=f"Advent of Code - Day {DAY} - Complete!"), style="red")
