@@ -1,16 +1,10 @@
-# Disabled imports
-# import attrs
-# import dataclasses
-# import math
-# import re
-# import time
-import numpy as np
-from rich import print as rprint
+import re
 from rich.console import Console
 from rich.panel import Panel
 from rich import rule
+from rich.markup import escape
 
-from typing import Optional, List, Tuple, Dict, Union, Literal, NewType
+from typing import List, Tuple, Literal
 
 console = Console()
 cprint = console.print
@@ -67,40 +61,90 @@ def read_lines(fpath: str) -> list[str]:
     return lines
 
 
-def part1(fpath: str) -> int:
+def if_debug_print(debug: bool, msg: str, esc: bool = False) -> None:
+    msg = escape(msg) if esc else msg
+    cprint(msg) if debug else None
+
+
+def parse_mul_ops(line: str, debug: bool) -> List[Tuple[int, int]]:
+    pattern = r"mul\((\d{1,3}),(\d{1,3})\)"
+    matches = re.findall(pattern, line)
+    ops = [(int(x), int(y)) for x, y in matches]
+
+    if debug:
+        cprint("\n[blue]mul operands[/blue]:\n")
+        cprint(ops)
+        cprint("\n[green]mul operands[/green]:\n")
+        cprint(ops)
+        cprint()
+
+    return ops
+
+
+def filter_dont_blocks(instructions: str, debug: bool) -> str:
+    pattern = r"don't\(\).*?($|do\(\))"
+    do_blocks = re.sub(pattern, "", instructions, flags=re.DOTALL)
+
+    # Print debug info if requested
+    if debug:
+        cprint("\n[blue]instructions[/blue]:\n")
+        cprint(escape(instructions))
+        cprint("\n[green]do_blocks[/green]:\n")
+        cprint(escape(do_blocks))
+        cprint()
+
+    return do_blocks
+
+
+def part1(fpath: str, debug: bool) -> int:
+    darg = {"debug": debug}
     lines = read_lines(fpath)
 
-    return 0
+    # The instructions need to be one long line this time
+    instructions = "".join(lines)
+
+    # Parse out the mul(X,Y) operands from the instructions
+    muls = parse_mul_ops(instructions, **darg)
+    total = sum(x * y for x, y in muls)
+
+    return total
 
 
-def part2(fpath: str) -> int:
+def part2(fpath: str, debug: bool) -> int:
+    darg = {"debug": debug}
     lines = read_lines(fpath)
+    instructions = "".join(lines)
 
-    return 0
+    instructions = filter_dont_blocks(instructions, **darg)
+
+    muls = parse_mul_ops(instructions, **darg)
+    total = sum(x * y for x, y in muls)
+
+    return total
 
 
-def main(day_str: str) -> None:
+def main(day_str: str, d: bool) -> None:
     EXAMPLE = f"{day_str}/example.txt"
+    EXAMPLE2 = f"{day_str}/example2.txt"
     INPUT = f"{day_str}/input.txt"
     TITLES = [  # Toggle these to control which parts of the code are run
         "Part One - EXAMPLE",
-        # NOTE: Uncomment these lines when ready to try real input or next part
-        # "Part One - INPUT",
-        # "Part Two - EXAMPLE",
-        # "Part Two - INPUT",
+        "Part One - INPUT",
+        "Part Two - EXAMPLE",
+        "Part Two - INPUT",
     ]
     for t in TITLES:
         print_panel(t, style="bold green")
         if "one" in t.lower() or "1" in t.lower():
             if "example" in t.lower():
-                print_solution(f"{part1(EXAMPLE)}", title=t)
+                print_solution(f"{part1(EXAMPLE, d)}", title=t)
                 continue
-            print_solution(f"{part1(INPUT)}", title=t)
+            print_solution(f"{part1(INPUT, d)}", title=t)
             continue
         if "example" in t.lower():
-            print_solution(f"{part2(EXAMPLE)}", title=t)
+            print_solution(f"{part2(EXAMPLE2, d)}", title=t)
             continue
-        print_solution(f"{part2(INPUT)}", title=t)
+        print_solution(f"{part2(INPUT, d)}", title=t)
 
 
 if __name__ == "__main__":
@@ -110,8 +154,8 @@ if __name__ == "__main__":
     DAY_TITLE = "Mull It Over"
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "--quiet",
-        "-q",
+        "--debug",
+        "-d",
         action="store_true",
         help="Don't print debug lines of anything to the console",
     )
@@ -119,7 +163,7 @@ if __name__ == "__main__":
     # msg = f"[bold green]Advent of Code - Day {DAY} - {DAY_TITLE}[/bold green]"
     cprint(rule.Rule(title=f"Advent of Code - Day {DAY} - {DAY_TITLE}"), style="red")
     # print_panel(msg ,style="bold red")
-    main(DAY)
+    main(DAY, args.debug)
     # msg = f"[bold red]Advent of Code - Day {DAY} - Complete![/bold red]"
     # print_panel(msg, style="bold green")
     cprint(rule.Rule(title=f"Advent of Code - Day {DAY} - Complete!"), style="red")
