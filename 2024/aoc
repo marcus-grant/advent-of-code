@@ -4,7 +4,8 @@ import argparse
 from argparse import ArgumentParser
 import sys
 
-import cmd.solve as day_solver
+import cmd.solve
+import cmd.new
 
 from util.sols import cprint
 
@@ -20,6 +21,7 @@ def main():
 
     # Define available subcommands
     subparsers.add_parser("solve", help="Solve a problem")
+    subparsers.add_parser("new", help="Create a new advent day")
 
     # Parse only the first two arguments (script name and subcommand)
     if len(sys.argv) < 2:
@@ -31,7 +33,10 @@ def main():
 
     # Identify the subcommand to run the right main
     if args.command == "solve":
-        day_solver.main(remaining_args)
+        cmd.solve.main(remaining_args)
+        sys.exit(0)
+    if args.command == "new":
+        cmd.new.main(remaining_args)
         sys.exit(0)
 
     cprint("Invalid subcommand", style="bold red")
