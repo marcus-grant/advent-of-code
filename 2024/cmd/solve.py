@@ -4,10 +4,10 @@ import pathlib
 from rich import rule
 import sys
 
-from typing import Optional, List, Callable
+from typing import List, Callable
 
 from util.sols import dynamic_import, execute_part
-from util.sols import print_panel, print_solution, cprint
+from util.sols import print_solution, cprint
 
 
 def parser_factory() -> argparse.ArgumentParser:
@@ -98,9 +98,6 @@ def get_solvers(day: str, part: str) -> List[SolverType]:
 def main(args):
     args = parse_args(args)
 
-    cprint("Arguments:", style="bold blue")
-    cprint(args)
-
     # Set day's title via dynamic import
     YEAR = str(2024)
     title = getattr(dynamic_import(args.day), "TITLE", None)
@@ -108,10 +105,17 @@ def main(args):
 
     # Print the Title of the Day and solving prompt
     rule_title = f"Solving Advent of Code {YEAR} - Day {args.day} - {title}"
-    cprint(rule.Rule(title=rule_title), style="red")
 
     # Get the solvers for the specified day and part
     solvers = get_solvers(args.day, args.part)
+
+    # Print important variables for execution
+    cprint("Arguments:", style="bold blue")
+    cprint(args)
+    cprint("Solvers:", style="bold blue")
+    cprint(solvers)
+    cprint(rule.Rule(title=rule_title), style="red")
+
     # Check if no solvers
     if solvers is None or len(solvers) == 0:
         msg = f"No solvers found for Day {args.day} - Part {args.part}"
@@ -136,6 +140,7 @@ def main(args):
         path_real2 = path_real
 
     # First run the first part's solver with example data if requested
+    # FIXME: Weird bug where if sol is 0 it thinks no solution found
     if args.example and "1" in args.part:
         sol1_ex = execute_part(solvers[0], path_ex, args.debug)
         sol1_ex = sol1_ex if isinstance(sol1_ex, int) else None
