@@ -155,6 +155,55 @@ try another puzzle.
 If you still want to see it,
 you can [get your puzzle input][aoc-day06-input].
 
+## Optimizations
+
+I implemented several optimizations in the code.
+
+* Before changing the code, the simulator took:
+* Let's call this base
+* 113555.607 ms
+* Before changing Guard to not parse lines every time it took
+* Let's call this guard
+* 110783.375 ms
+* After implementing the candidate test with multiprocessing w/ 4 workers took:
+* Let's call this multi4
+* 54352.520 ms (2.04x speedup)
+* After changing workers to 8 it took:
+* Let's call this multi8
+* 53683.053 ms (1.01x speedup, from 4, 2.04x speedup from None)
+* Reducing MAX_STEPS to 10**5 took:
+* Let's call this max5
+* 50088.752 ms (1.07x speedup from 10**6, 2.15x speedup from original)
+
+Here's a table of the results:
+
+| Name   | Time (s) | Speedup
+|--------|----------|---------
+| base   |  113.556 | 1.00x
+| guard  |  110.783 | 1.02x
+| multi4 |   54.352 | 2.09x
+| multi8 |   53.683 | 2.11x
+| max5   |   50.089 | 2.26x
+
+I think the only significant speedup was the multiprocessing.
+Going beyond, I think I'd need to fix the loop detection algorithm.
+Maybe even pruning out guard states after a certain number of steps.
+Maybe even finding a better algorithm in general.
+
+```python
+# NOTE: Before changing the code, the simulator took:
+# 113555.607 ms
+# NOTE: Before changing Guard to not parse lines every time it took
+# 110783.375 ms
+# NOTE: After implementing the candidate test with multiprocessing w/ 4 workers took:
+# 54352.520 ms (2.04x speedup)
+# NOTE: After changing workers to 8 it took:
+# 53683.053 ms (1.01x speedup, from 4, 2.04x speedup from None)
+# Move run_candidate to top-level
+# NOTE: Reducing MAX_STEPS to 10**5 took:
+# 50088.752 ms (1.07x speedup from 10**6, 2.15x speedup from original)
+```
+
 ## Links
 
 * [Advent of Code - 2023 - Calendar][aoc-calendar]

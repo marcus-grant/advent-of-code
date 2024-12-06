@@ -1,39 +1,44 @@
-# Disabled imports
-# import attrs
-# import dataclasses
-# import math
-# import re
-# import numpy as np
-from concurrent.futures import ProcessPoolExecutor
 from enum import Enum
-import os
 import pathlib
 import time
-from typing import Union, List, Tuple, Set
+from typing import Union, List, Tuple, Set, Optional
 from rich.console import Console
 import sys
+from concurrent.futures import ProcessPoolExecutor
+import os
 
 console = Console()
 cprint = console.print
 
 DAY: str = "06"
 TITLE: str = "Guard Gallivant"
-COMMENTS: str = """Put any extra comments for helper script here"""
+COMMENTS: str = """Cleaner version without early exit heuristics"""
 
-# Types
 PathLike = Union[str, pathlib.Path]
 Position = Tuple[int, int]
 PositionSet = Set[Position]
-PositionList = List[Position]
 
 
 def read_lines(fpath: PathLike) -> List[str]:
+    """
+    Read lines from a given file path.
+
+    Args:
+        fpath (PathLike): The file path to read from.
+
+    Returns:
+        List[str]: A list of lines from the file.
+    """
     with open(fpath, "r") as f:
         lines = f.read().splitlines()
     return lines
 
 
 class Direction(Enum):
+    """
+    Direction is an enumeration representing the four cardinal directions.
+    """
+
     N = 0
     E = 1
     S = 2
@@ -41,7 +46,19 @@ class Direction(Enum):
 
 
 class Grid:
-    def __init__(self, lines: List[str], print_size: Position = (32, 64)):
+    """
+    Grid represents the environment in which the guard moves.
+    It stores obstacle positions, dimensions, and can print a portion of the grid.
+    """
+
+    def __init__(self, lines: List[str], print_size: Position = (16, 32)):
+        """
+        Initialize the Grid.
+
+        Args:
+            lines (List[str]): The lines representing the grid.
+            print_size (Position): The vertical and horizontal print boundary sizes.
+        """
         self.lines = lines
         self.print_height = print_size[0]
         self.print_width = print_size[1]
@@ -49,12 +66,20 @@ class Grid:
         self.grid_width = len(lines[0])
         self.pos_obstacles = self._parse_char_positions(lines)
 
-        # Ensure all lines have the same width
         if not all(len(line) == self.grid_width for line in lines):
             raise ValueError("All lines should have the same width.")
 
     def _parse_char_positions(self, lines: List[str], char: str = "#") -> PositionSet:
-        """Parse positions of obstacles '#' from the input lines."""
+        """
+        Parse obstacle positions from input lines.
+
+        Args:
+            lines (List[str]): The grid lines.
+            char (str): The character representing an obstacle.
+
+        Returns:
+            PositionSet: A set of coordinates (r, c) where obstacles are located.
+        """
         grid = set()
         for r, line in enumerate(lines):
             for c, ch in enumerate(line):
@@ -63,38 +88,52 @@ class Grid:
         return grid
 
     def inside(self, pos: Position) -> bool:
-        """Check if position is inside the grid."""
-        if not (0 <= pos[0] < self.grid_height):
-            return False
-        if not (0 <= pos[1] < self.grid_width):
-            return False
-        return True
-
-    def cprint(
-        self,
-        # DELETEME: old marker position and direction
-        # marker: Position,
-        # dir: Direction,
-        guard: "Guard",
-        visited: PositionSet,
-    ) -> None:
-        """Prints a portion of the grid around the marker.
-        Obstacles: '#', red
-        Marker: direction symbol in bold green
-        Visited (except current marker): '.' in yellow
-        Unvisited empty: '.' in dim gray
         """
-        marker = guard.position
-        dir = guard.direction
-        start_vert = max(marker[0] - self.print_height, 0)
-        start_horz = max(marker[1] - self.print_width, 0)
-        end_vert = min(marker[0] + self.print_height, self.grid_height)
-        end_horz = min(marker[1] + self.print_width, self.grid_width)
+        Check if a position is inside the grid.
+
+        Args:
+            pos (Position): The position to check.
+
+        Returns:
+            bool: True if inside the grid, False otherwise.
+        """
+        return 0 <= pos[0] < self.grid_height and 0 <= pos[1] < self.grid_width
+
+    # TODO: Could use improvement
+    def cprint(self, marker: Position, dir: Direction, visited: PositionSet) -> None:
+        """
+        Print a portion of the grid around the marker, ensuring a stable window size.
+
+        This method prints a region of the grid centered on the marker with the dimensions:
+        (2 * print_height + 1) rows by (2 * print_width + 1) columns.
+        If the marker is near the edge, the window shifts so it remains within the grid.
+        """
+        # Desired dimensions
+        total_height = 2 * self.print_height + 1
+        total_width = 2 * self.print_width + 1
+
+        # Compute the ideal top-left corner to center on the marker
+        top = marker[0] - self.print_height
+        left = marker[1] - self.print_width
+
+        # Adjust if going out of the grid bounds vertically
+        if top < 0:
+            top = 0
+        elif top + total_height > self.grid_height:
+            top = max(self.grid_height - total_height, 0)
+
+        # Adjust if going out of the grid bounds horizontally
+        if left < 0:
+            left = 0
+        elif left + total_width > self.grid_width:
+            left = max(self.grid_width - total_width, 0)
+
+        # Now we have a stable window [top:top+total_height, left:left+total_width]
         direction_markers = ["^", ">", "v", "<"]
 
-        for r in range(start_vert, end_vert):
+        for r in range(top, top + total_height):
             line_chars = []
-            for c in range(start_horz, end_horz):
+            for c in range(left, left + total_width):
                 if (r, c) in self.pos_obstacles:
                     line_chars.append(("#", "red"))
                 elif (r, c) == marker:
@@ -105,22 +144,39 @@ class Grid:
                         line_chars.append(("x", "color(8)"))
                     else:
                         line_chars.append((".", "color(8)"))
-            # Print line
             for ch, style in line_chars:
                 cprint(ch, end="", style=style)
-            cprint("")  # new line
+            cprint("")
 
 
 class Guard:
+    """
+    Guard represents the entity moving on the grid.
+    It has a position and a direction, and can move forward or turn.
+    """
+
     def __init__(self, position: Position, direction: Direction):
+        """
+        Initialize the Guard.
+
+        Args:
+            position (Position): The starting position of the guard.
+            direction (Direction): The starting direction of the guard.
+        """
         self.position = position
         self.direction = direction
 
     @classmethod
     def _parse_marker(cls, lines: List[str]) -> Tuple[Position, Direction]:
-        """Parse the guard's starting position and
-        direction from markers: '^', '>', 'v', '<'.
-        Return one of Direction enums and raise error if not found."""
+        """
+        Parse the guard's starting position and direction from the input lines.
+
+        Args:
+            lines (List[str]): The grid lines.
+
+        Returns:
+            Tuple[Position, Direction]: The guard's starting position and direction.
+        """
         n, e, s, w = Direction.N, Direction.E, Direction.S, Direction.W
         markers = {"^": n, ">": e, "v": s, "<": w}
         for r, line in enumerate(lines):
@@ -130,10 +186,18 @@ class Guard:
         raise ValueError("No marker found in the grid.")
 
     def turn(self) -> None:
-        """Turn direction 90 degrees to the right."""
+        """
+        Turn the guard 90 degrees to the right.
+        """
         self.direction = Direction((self.direction.value + 1) % 4)
 
     def forward_pos(self) -> Position:
+        """
+        Get the position in front of the guard based on its current direction.
+
+        Returns:
+            Position: The next position if the guard moves forward.
+        """
         if self.direction == Direction.N:
             return (self.position[0] - 1, self.position[1])
         elif self.direction == Direction.E:
@@ -146,15 +210,111 @@ class Guard:
             raise ValueError("Invalid direction.")
 
     def move_forward(self):
+        """
+        Move the guard one step forward in its current direction.
+        """
         self.position = self.forward_pos()
 
 
-# FIXME: The windowing logic is broken and print shape is inconsistent
-def record_path(path: List[Position], pos_marker: Position) -> List[Position]:
-    """Record intermediate positions between last recorded and the new pos_marker.
+class Simulator:
+    """
+    Simulator runs the guard's movement on the given grid until either:
+    - The guard leaves the grid
+    - A loop in guard states (position, direction) is detected
+    - The maximum step count is reached
 
-    We assume motion is either purely horizontal or purely vertical.
-    If both row and column changed, raise an error.
+    If record_positions is True, all visited cells are recorded.
+    """
+
+    def __init__(
+        self,
+        grid: Grid,
+        guard: Guard,
+        max_steps: int = 10**6,
+        record_positions: bool = False,
+    ) -> None:
+        """
+        Initialize the simulator.
+
+        Args:
+            grid (Grid): The grid on which the guard moves.
+            guard (Guard): The guard to simulate.
+            max_steps (int): Maximum steps to simulate before giving up.
+            record_positions (bool): If True, record all visited cells.
+        """
+        self.grid: Grid = grid
+        self.guard: Guard = guard
+        self.max_steps: int = max_steps
+        self.record_positions: bool = record_positions
+
+        # Set of encountered guard states, each state is (position, direction)
+        self.encountered_states: Set[Tuple[Position, Direction]] = set()
+
+        # If recording positions, initialize a set to store visited cells
+        self.visited_cells: Optional[Set[Position]] = (
+            set() if record_positions else None
+        )
+        if self.visited_cells is not None:
+            self.visited_cells.add(self.guard.position)
+
+    def run(self) -> Tuple[bool, Set[Position]]:
+        """
+        Run the simulation until the guard leaves the grid or a loop is detected.
+
+        Returns:
+            Tuple[bool, Set[Position]]:
+                loop_detected: True if a loop is found, False otherwise.
+                visited_positions: The set of visited cells if record_positions is True,
+                                   otherwise an empty set.
+        """
+        steps = 0
+        self.encountered_states.add((self.guard.position, self.guard.direction))
+
+        while self.grid.inside(self.guard.position) and steps < self.max_steps:
+            next_pos = self.guard.forward_pos()
+
+            if self.grid.inside(next_pos):
+                if next_pos in self.grid.pos_obstacles:
+                    self.guard.turn()
+                else:
+                    self.guard.move_forward()
+                    if self.visited_cells is not None:
+                        self.visited_cells.add(self.guard.position)
+            else:
+                # Guard leaves the grid
+                return (
+                    False,
+                    self.visited_cells if self.visited_cells is not None else set(),
+                )
+
+            steps += 1
+
+            current_state = (self.guard.position, self.guard.direction)
+            if current_state in self.encountered_states:
+                # Loop detected
+                return (
+                    True,
+                    self.visited_cells if self.visited_cells is not None else set(),
+                )
+            else:
+                self.encountered_states.add(current_state)
+
+        # No loop detected and guard didn't leave (maybe max_steps reached)
+        return (False, self.visited_cells if self.visited_cells is not None else set())
+
+
+def record_path(path: List[Position], pos_marker: Position) -> List[Position]:
+    """
+    Record intermediate positions between the last recorded and the new pos_marker.
+
+    This function is not currently used but provided for reference.
+
+    Args:
+        path (List[Position]): The current recorded path.
+        pos_marker (Position): The new position of the marker.
+
+    Returns:
+        List[Position]: The updated path with intermediate positions included.
     """
     if len(path) == 0:
         path.append(pos_marker)
@@ -164,24 +324,19 @@ def record_path(path: List[Position], pos_marker: Position) -> List[Position]:
     drow = pos_marker[0] - last[0]
     dcol = pos_marker[1] - last[1]
 
-    # If no movement
     if drow == 0 and dcol == 0:
-        # no movement, just return
         return path
 
-    # If both row and column changed, it's invalid
     if drow != 0 and dcol != 0:
         raise ValueError("Marker moved diagonally, which should not happen.")
 
     if drow != 0:
-        # vertical movement
         step = 1 if drow > 0 else -1
         for _ in range(abs(drow)):
             curr = path[-1]
             new_pos = (curr[0] + step, curr[1])
             path.append(new_pos)
     elif dcol != 0:
-        # horizontal movement
         step = 1 if dcol > 0 else -1
         for _ in range(abs(dcol)):
             curr = path[-1]
@@ -192,18 +347,27 @@ def record_path(path: List[Position], pos_marker: Position) -> List[Position]:
 
 
 def part1(fpath: PathLike, debug: bool = False) -> int:
+    """
+    Solve part 1 of the puzzle.
+
+    Args:
+        fpath (PathLike): The path to the input file.
+        debug (bool): If True, prints debugging information whenever the guard hits an obstacle.
+
+    Returns:
+        int: The count of visited distinct positions by the guard before leaving the grid.
+    """
     lines = read_lines(fpath)
     grid = Grid(lines)
     guard_start_pos, guard_start_dir = Guard._parse_marker(lines)
     guard = Guard(guard_start_pos, guard_start_dir)
 
-    visited = set()
-    visited.add(guard.position)
+    sim = Simulator(grid, guard, max_steps=10**6, record_positions=True)
 
-    MAX_STEPS = 10**6
-    steps = 0
+    loop_found = False
+    sim.encountered_states.add((guard.position, guard.direction))
 
-    while grid.inside(guard.position) and steps < MAX_STEPS:
+    while grid.inside(guard.position) and len(sim.encountered_states) < sim.max_steps:
         next_pos = guard.forward_pos()
 
         if grid.inside(next_pos):
@@ -211,57 +375,26 @@ def part1(fpath: PathLike, debug: bool = False) -> int:
                 # Obstacle ahead, turn right
                 guard.turn()
                 if debug:
-                    cprint(f"[DEBUG] Step {steps}: Hit obstacle. Turned right.")
-                    grid.cprint(guard, visited)
+                    cprint("[DEBUG] Hit obstacle and turned right:")
+                    grid.cprint(
+                        guard.position, guard.direction, sim.visited_cells or set()
+                    )
             else:
                 # Move forward
                 guard.move_forward()
-                visited.add(guard.position)
+                if sim.visited_cells is not None:
+                    sim.visited_cells.add(guard.position)
         else:
-            # Stepping out of the grid
-            guard.position = next_pos
+            # Guard leaves the grid
             break
 
-        steps += 1
+        current_state = (guard.position, guard.direction)
+        if current_state in sim.encountered_states:
+            loop_found = True
+            break
+        sim.encountered_states.add(current_state)
 
-    return len(visited)
-
-
-class Simulator:
-    def __init__(self, grid: Grid, guard: Guard, max_steps: int = 10**6) -> None:
-        self.grid = grid
-        self.guard = guard
-        self.MAX_STEPS = max_steps
-        self.states = set()
-
-    def run(self) -> bool:
-        """Runs a simulation untill the guard leaves the grid or a loop is detected."""
-        # Record init state
-        self.states.add((self.guard.position, self.guard.direction))
-
-        steps = 0
-        while self.grid.inside(self.guard.position) and steps < self.MAX_STEPS:
-            next_pos = self.guard.forward_pos()
-
-            if self.grid.inside(next_pos):
-                if next_pos in self.grid.pos_obstacles:
-                    self.guard.turn()  # Obstacle ahead, turn right
-                else:  # Move forward
-                    self.guard.move_forward()
-            else:  # Guard leaves grid, no loop found, end simulation
-                return False
-
-            steps += 1
-
-            current_state = (self.guard.position, self.guard.direction)
-            if current_state in self.states:
-                return True  # Loop detected
-            else:
-                # Record state to check for a loop in the future
-                self.states.add(current_state)
-
-        # If we exit the loop normally, no loop was detected
-        return False
+    return len(sim.visited_cells) if sim.visited_cells is not None else 0
 
 
 def test_candidate(
@@ -272,48 +405,64 @@ def test_candidate(
     max_steps: int = 10**6,
 ) -> bool:
     """
-    Test if placing an obstruction at 'candidate' leads to a loop.
-    - Adds the candidate obstruction to the grid.
-    - Creates a new Guard from the input lines.
-    - Runs the Simulator with the given grid and guard.
-    - Removes the obstruction afterward.
-    Returns True if a loop is detected, False otherwise.
+    Test if placing an obstruction at the candidate position causes a loop.
+
+    Args:
+        candidate (Position): The position to place the new obstruction.
+        grid (Grid): The grid in which the guard moves.
+        guard_pos (Position): The guard's starting position.
+        guard_dir (Direction): The guard's starting direction.
+        max_steps (int): Maximum number of steps to simulate.
+
+    Returns:
+        bool: True if a loop is detected, False otherwise.
     """
-    # Place the obstruction
     grid.pos_obstacles.add(candidate)
-
-    # Create new guard
     guard = Guard(guard_pos, guard_dir)
-
-    # Run simulation
     sim = Simulator(grid, guard, max_steps=max_steps)
-    loop_found = sim.run()
-
-    # Remove the obstruction
+    loop_found, _ = sim.run()
     grid.pos_obstacles.remove(candidate)
-
     return loop_found
 
 
-# NOTE: Before changing the code, the simulator took:
-# 113555.607 ms
-# NOTE: Before changing Guard to not parse lines every time it took
-# 110783.375 ms
-# NOTE: After implementing the candidate test with multiprocessing w/ 4 workers took:
-# 54352.520 ms (2.04x speedup)
-# Move run_candidate to top-level
 def run_candidate(args: Tuple[Position, List[str], Position, Direction]) -> bool:
+    """
+    Wrapper function to rebuild the grid and test a candidate obstruction.
+
+    Args:
+        args (Tuple[Position, List[str], Position, Direction]):
+            candidate: The candidate obstruction position.
+            lines: The grid lines.
+            guard_start_pos: The guard's start position.
+            guard_start_dir: The guard's start direction.
+
+    Returns:
+        bool: True if a loop is detected by placing the candidate obstruction.
+    """
     candidate, lines, guard_start_pos, guard_start_dir = args
     test_grid = Grid(lines)
     return test_candidate(candidate, test_grid, guard_start_pos, guard_start_dir)
 
 
 def part2(fpath: PathLike, debug: bool = False) -> int:
+    """
+    Solve part 2 of the puzzle.
+
+    Args:
+        fpath (PathLike): The path to the input file.
+        debug (bool): If True, prints a message but won't debug for large input due to performance.
+
+    Returns:
+        int: The count of positions where placing a new obstruction leads to a loop.
+    """
+    # If debugging is enabled but this is the real input, we won't debug due to performance.
+    if debug and "input.txt" in str(fpath):
+        print("\nDebugging disabled on this part due to performance issues.\n")
+
     lines = read_lines(fpath)
     grid = Grid(lines)
     guard_start_pos, guard_start_dir = Guard._parse_marker(lines)
 
-    # Generate candidates
     candidates = [
         (r, c)
         for r in range(grid.grid_height)
@@ -321,16 +470,12 @@ def part2(fpath: PathLike, debug: bool = False) -> int:
         if (r, c) not in grid.pos_obstacles and (r, c) != guard_start_pos
     ]
 
-    loop_count = 0
-
-    # Prepare arguments for each candidate
-    # We'll pass all needed data as a tuple so run_candidate can be pickled
     tasks = [
         (candidate, lines, guard_start_pos, guard_start_dir) for candidate in candidates
     ]
 
-    # Adjust workers as you like (e.g. max_workers=4)
-    with ProcessPoolExecutor(max_workers=4) as executor:
+    loop_count = 0
+    with ProcessPoolExecutor(max_workers=os.cpu_count()) as executor:
         for result in executor.map(run_candidate, tasks):
             if result:
                 loop_count += 1
@@ -339,18 +484,51 @@ def part2(fpath: PathLike, debug: bool = False) -> int:
 
 
 def bgrn(s) -> str:
+    """
+    Return a string formatted in green and bold.
+
+    Args:
+        s (str): The string to format.
+
+    Returns:
+        str: The formatted string.
+    """
     return f"\033[1;32m{s}\033[0m"
 
 
 def mgta(s) -> str:
+    """
+    Return a string formatted in magenta.
+
+    Args:
+        s (str): The string to format.
+
+    Returns:
+        str: The formatted string.
+    """
     return f"\033[35m{s}\033[0m"
 
 
 def blue(s) -> str:
+    """
+    Return a string formatted in blue.
+
+    Args:
+        s (str): The string to format.
+
+    Returns:
+        str: The formatted string.
+    """
     return f"\033[34m{s}\033[0m"
 
 
 def run(debug: bool = False) -> None:
+    """
+    Run both parts of the puzzle solution, printing results and timings.
+
+    Args:
+        debug (bool): If True, enable debugging prints in part1 and a note in part2.
+    """
     PATH_EX = pathlib.Path(__file__).parent / "example.txt"
     PATH_IN = pathlib.Path(__file__).parent / "input.txt"
     kw = {"debug": debug}
@@ -364,7 +542,6 @@ def run(debug: bool = False) -> None:
     print(f"\n{mgta('Solution with Example Data:')}\t{bgrn(sol)}\n")
     print(blue(f"Time taken (ms):\t\t{ms}\n"))
 
-    # Uncomment these lines if you have the real input.txt
     tstart = time.time()
     sol = part1(PATH_IN, **kw)
     ms = f"{1000 * (time.time() - tstart):.3f}"
