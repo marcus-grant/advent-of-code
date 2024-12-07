@@ -4,10 +4,16 @@
 # import math
 # import re
 # import numpy as np
+import functools
+import math
 import pathlib
+from rich.console import Console
 import time
-from typing import Union, List  # , Tuple, Dict, Literal, NewType, Optional
+from typing import Union, List, Optional, Tuple  # , Tuple, Dict, Literal, NewType
 import sys
+
+console = Console()
+cprint = console.print
 
 # Util imports
 # from ..util.sols import cprint
@@ -27,20 +33,203 @@ def read_lines(fpath: PathLike) -> List[str]:
     return lines
 
 
+def dp_recurse(target: int, nums: List[int], idx: int, current: int) -> List[str]:
+    if idx == len(nums):  # Base case
+        if current == target:
+            return [""]  # Return empty - no need to append more operators
+        return []  # Return None - no solution found
+
+    # Initialization of recursive calls
+    num_next = nums[idx]
+    sequences = []
+
+    # Possibility 1: Add (first since it takes less time)
+    result_add = dp_recurse(target, nums, idx + 1, current + num_next)
+    for seq in result_add:
+        sequences.append("+" + seq)
+
+    # Possibility 2: Multiply
+    result_mul = dp_recurse(target, nums, idx + 1, current * num_next)
+    for seq in result_mul:
+        sequences.append("*" + seq)
+
+    # If out of numbers, return the sequences
+    return sequences
+
+
+def cprint_seq(nums: List[int], seq: Optional[str]) -> None:
+    cprint("Numbers Sequence:", style="blue", end="\t\t")
+    cprint(" ".join(str(n) for n in nums))
+    # Determine how many spaces to pad with first numbers
+    pad = "\t\t" + (" " * (math.floor(math.log10(nums[0])) + 1))
+    cprint("Operation Sequence:", style="blue", end=pad)
+    if seq is None:
+        cprint("No solution found", style="red")
+        return
+    s = ""
+    for op in seq:
+        if op == "+":
+            s += " [green]+[/green] "
+        elif op == "*":
+            s += " [magenta]*[/magenta] "
+        elif op == "|":
+            s += " [yellow]|[/yellow] "
+        else:
+            msg = f"ERROR: Invalid operator: {op}\n{seq}"
+            cprint(msg, style="red")
+    s = s[1:-1]
+    cprint(s)
+
+
+def cprint_dp_result(res: int, i_res: int, nums: List[int], seqs: List[str]) -> None:
+    cprint(f"\nResult #{i_res} = {res}", style="magenta")
+    if len(seqs) == 0:
+        cprint(f"No solution found for:\t\t{nums}", style="red")
+    for j, seq in enumerate(seqs):
+        cprint(f"Possible Sequence {j}:", style="blue")
+        cprint_seq(nums, seq)
+
+
+# NOTE: Unmemoized version of recursion took 83.336ms for Part 1
+# NOTE: Memoized version of recursion took 176.220ms for Part 1 ?!?!
 def part1(fpath: PathLike, debug: bool = False) -> int:
-    lines = read_lines(fpath)
+    # Parse input into a list[int] of results & list[list[int]] of operands per result
+    lines = [line for line in read_lines(fpath)]
+    numline = [[int(s.strip(":")) for s in line.split()] for line in lines]
+    del lines
+    results = [line[0] for line in numline]
+    nums_list = [line[1:] for line in numline]
+    del numline
+    if debug:
+        cprint("Results:", style="magenta")
+        cprint(results, style="green")
+        cprint("Operands:", style="magenta")
+        cprint(nums_list, style="green")
 
-    # TODO: Implement solution here
+    # Setup recurion for Dynamic Programming in loop for every result
+    # FIXME: Perform all DP calculations in one go then print results
+    valid_results = []
+    sequence_count = 0
+    for i, res in enumerate(results):
+        ops_seq = dp_recurse(res, nums_list[i], 1, nums_list[i][0])
+        sequence_count += len(ops_seq)
+        if debug:
+            cprint_dp_result(res, i, nums_list[i], ops_seq)
+        if len(ops_seq) > 0:
+            valid_results.append(res)
 
-    return 69
+    if debug:
+        cprint(f"Total Valid Sequences: {sequence_count}", style="blue")
+        cprint("\nValid Results:", style="blue")
+        cprint(", ".join(str(x) for x in valid_results), style="green")
+
+    return sum(valid_results)
 
 
+def dp_recurse3(target: int, nums: list[int], idx: int, current: int) -> list[str]:
+    if idx == len(nums):  # base case
+        if current == target:
+            return [""]  # return empty - no need to append more operators
+        return []  # return none - no solution found
+
+    # initialization of recursive calls
+    num_next = nums[idx]
+    sequences = []
+
+    # possibility 1: add (first since it takes less time)
+    result_add = dp_recurse3(target, nums, idx + 1, current + num_next)
+    for seq in result_add:
+        sequences.append("+" + seq)
+
+    # possibility 2: multiply
+    result_mul = dp_recurse3(target, nums, idx + 1, current * num_next)
+    for seq in result_mul:
+        sequences.append("*" + seq)
+
+    # possibility 3: concat
+    result_cat = dp_recurse3(target, nums, idx + 1, int(str(current) + str(num_next)))
+    for seq in result_cat:
+        sequences.append("|" + seq)
+
+    # if out of numbers, return the sequences
+    return sequences
+
+
+def dp_recurse_memo(target: int, nums: List[int], idx: int, current: int) -> List[str]:
+    """
+    Memoized recursive function to find all sequences of '+' and '*' operations
+    that transform the list of numbers into the target value.
+
+    Parameters:
+    - target (int): The desired target value.
+    - nums (List[int]): The list of numbers.
+    - idx (int): The current index in the list of numbers.
+    - current (int): The current accumulated value.
+
+    Returns:
+    - List[str]: A list of operation sequences that achieve the target.
+                 Each sequence is a string composed of '+' and '*' characters.
+    """
+
+    @functools.lru_cache(maxsize=None)
+    def recurse(idx: int, current: int) -> tuple:
+        # Base case: All numbers have been processed
+        if idx == len(nums):
+            if current == target:
+                return ("",)  # Return a tuple with an empty string
+            else:
+                return ()  # Return an empty tuple indicating no valid sequence
+
+        num_next = nums[idx]
+        sequences = []
+
+        # Possibility 1: Addition
+        result_add = recurse(idx + 1, current + num_next)
+        for seq in result_add:
+            sequences.append("+" + seq)
+
+        # Possibility 2: Multiplication
+        result_mul = recurse(idx + 1, current * num_next)
+        for seq in result_mul:
+            sequences.append("*" + seq)
+
+        return tuple(sequences)  # Convert list to tuple for caching
+
+    # Initiate recursion
+    return list(recurse(idx, current))
+
+
+# NOTE: Naive recursion took 6034.204 ms for Part 2
 def part2(fpath: PathLike, debug: bool = False) -> int:
-    lines = read_lines(fpath)
+    # Parse again
+    lines = [line for line in read_lines(fpath)]
+    numline = [[int(s.strip(":")) for s in line.split()] for line in lines]
+    del lines
+    results = [line[0] for line in numline]
+    nums_list = [line[1:] for line in numline]
+    del numline
+    if debug:
+        cprint("Results:", style="magenta")
+        cprint(results, style="green")
+        cprint("Operands:", style="magenta")
+        cprint(nums_list, style="green")
+
+    # Setup recurion for Dynamic Programming in loop for every result
+    valid_results = []
+    for i, res in enumerate(results):
+        ops_seq = dp_recurse3(res, nums_list[i], 1, nums_list[i][0])
+        if debug:
+            cprint_dp_result(res, i, nums_list[i], ops_seq)
+        if len(ops_seq) > 0:
+            valid_results.append(res)
+
+    if debug:
+        cprint("\nValid Results:", style="blue")
+        cprint(", ".join(str(x) for x in valid_results), style="green")
 
     # TODO: Implement solution here
 
-    return 420
+    return sum(valid_results)
 
 
 def bgrn(s) -> str:
@@ -98,3 +287,4 @@ if __name__ == "__main__":
     # Check for single --debug or -d flag without argparse
     debug = any(arg in {"--debug", "-d"} for arg in sys.argv)
     run(debug)
+
