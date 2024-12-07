@@ -124,26 +124,148 @@ positions visited by the guard before leaving are marked with an `X`:
 ......#X..
 ```
 
-In this example, the guard will visit **`41`** distinct positions on your map.
+In this example, the guard will visit **(`41`)** distinct positions on your map.
 
 Predict the path of the guard.
 **How many distinct positions will the guard visit before**
 **leaving the mapped area?**
 
-**Your puzzle answer was `PLACEHOLDER FOR VERIFIED INPUT ANSWER`**.
+**Your puzzle answer was `4656`**.
 
 ## Part Two
 
-***PLACEHOLDER FOR TEXT BEFORE EXAMPLE***
+While The Historians begin working around the guard's patrol route,
+you borrow their fancy device and step outside the lab.
+From the safety of a supply closet,
+you time travel through the last few months and [record][aoc-18-day05]
+the nightly status of the lab's guard post on the walls of the closet.
 
-```txt
-GO TO URL BELOW, COPY SECOND EXAMPLE TEXT, AND PASTE HERE
-https://adventofcode.com/2024/day/6
+Returning after what seems like only a few seconds to The Historians,
+they explain that the guard's patrol area is simply too large for them to
+safely search the lab without getting caught.
+
+Fortunately, they are **pretty sure** that
+adding a single new obstruction **won't** cause a time paradox.
+They'd like to place the new obstruction in such a way that
+the guard will get **stuck in a loop**,
+making the rest of the lab safe to search.
+
+To have the lowest chance of creating a time paradox,
+The Historians would like to know **all** of
+the possible positions for such an obstruction.
+The new obstruction can't be placed at the guard's starting position -
+the guard is there right now and would notice.
+
+In the above example, there are only **`6`** different positions where
+a new obstruction would cause the guard to get stuck in a loop.
+The diagrams of these six situations use `O` to mark the new obstruction,
+`|` to show a position where the guard moves up/down,
+`-` to show a position where the guard moves left/right,
+and `+` to show a position where the guard moves both up/down and left/right.
+
+Option one, put a printing press next to the guard's starting position:
+
+```plaintext
+....#.....
+....+---+#
+....|...|.
+..#.|...|.
+....|..#|.
+....|...|.
+.#.O^---+.
+........#.
+#.........
+......#...
 ```
 
-***PLACEHOLDER FOR TEXT AFTER EXAMPLE***
+Option two, put a stack of failed suit prototypes in
+the bottom right quadrant of the mapped area:
 
-Your puzzle answer was *`PLACEHOLDER FOR VERIFIED INPUT ANSWER`*.
+```plaintext
+....#.....
+....+---+#
+....|...|.
+..#.|...|.
+..+-+-+#|.
+..|.|.|.|.
+.#+-^-+-+.
+......O.#.
+#.........
+......#...
+```
+
+Option three,
+put a crate of chimney-squeeze prototype fabric next to the standing desk in
+the bottom right quadrant:
+
+```plaintext
+....#.....
+....+---+#
+....|...|.
+..#.|...|.
+..+-+-+#|.
+..|.|.|.|.
+.#+-^-+-+.
+.+----+O#.
+#.........
+......#...
+```
+
+Option four, put an alchemical retroencabulator near the bottom left corner:
+
+```plaintext
+....#.....
+....+---+#
+....|...|.
+..#.|...|.
+..+-+-+#|.
+..|.|.|.|.
+.#+-^-+-+.
+..|...|.#.
+#O+---+...
+......#...
+```
+
+Option five, put the alchemical retroencabulator a bit to the right instead:
+
+```plaintext
+....#.....
+....+---+#
+....|...|.
+..#.|...|.
+..+-+-+#|.
+..|.|.|.|.
+.#+-^-+-+.
+....|.|.#.
+#..O+-+...
+......#...
+```
+
+Option six, put a tank of sovereign glue right next to the tank of universal solvent:
+
+```plaintext
+....#.....
+....+---+#
+....|...|.
+..#.|...|.
+..+-+-+#|.
+..|.|.|.|.
+.#+-^-+-+.
+.+----++#.
+#..+----++
+......#O..
+```
+
+It doesn't really matter what you choose to use as an obstacle so long as
+you and The Historians can put it into position without the guard noticing.
+The important thing is having enough options that you can find one that
+minimizes time paradoxes,
+and in this example, there are `**6**` different positions you could choose.
+
+You need to get the guard stuck in a loop by adding a single new obstruction.
+**How many different positions could you choose for this obstruction?**
+
+Your puzzle answer was *`1575`*.
 
 **Both parts of this puzzle are complete!
 They provide two gold stars: \*\***
@@ -160,49 +282,35 @@ you can [get your puzzle input][aoc-day06-input].
 I implemented several optimizations in the code.
 
 * Before changing the code, the simulator took:
-* Let's call this base
-* 113555.607 ms
-* Before changing Guard to not parse lines every time it took
-* Let's call this guard
-* 110783.375 ms
-* After implementing the candidate test with multiprocessing w/ 4 workers took:
-* Let's call this multi4
-* 54352.520 ms (2.04x speedup)
+  * **113555.607 ms**
+  * Let's call this the `base` case
+* After changing `Guard` to not parse lines every time it took
+  * **110783.375 ms**
+  * Let's call this case `guard`
+* After implementing `candidate_test` with multiprocessing with 4 workers took:
+  * **54352.520 ms** (2.04x speedup)
+  * Let's call this `mult4`
 * After changing workers to 8 it took:
-* Let's call this multi8
-* 53683.053 ms (1.01x speedup, from 4, 2.04x speedup from None)
+  * 53683.053 ms (1.01x speedup, from 4, 2.04x speedup from None)
+  * Let's call this `mult8`
 * Reducing MAX_STEPS to 10**5 took:
-* Let's call this max5
-* 50088.752 ms (1.07x speedup from 10**6, 2.15x speedup from original)
+  * 50088.752 ms (1.07x speedup from 10**6, 2.15x speedup from original)
+  * Let's call this max5
 
 Here's a table of the results:
 
-| Name   | Time (s) | Speedup
-|--------|----------|---------
-| base   |  113.556 | 1.00x
-| guard  |  110.783 | 1.02x
-| multi4 |   54.352 | 2.09x
-| multi8 |   53.683 | 2.11x
-| max5   |   50.089 | 2.26x
+| Name  | Time (s) | Speedup (Base) | Speedup (Inc.) |
+|-------|----------|----------------|----------------|
+| base  |  113.556 |          1.00x |          1.00x |
+| guard |  110.783 |          1.02x |          1.02x |
+| mult4 |   54.352 |          2.09x |          2.04x |
+| mult8 |   53.683 |          2.11x |          1.03x |
+| max5  |   50.089 |          2.26x |          1.07x |
 
 I think the only significant speedup was the multiprocessing.
 Going beyond, I think I'd need to fix the loop detection algorithm.
 Maybe even pruning out guard states after a certain number of steps.
 Maybe even finding a better algorithm in general.
-
-```python
-# NOTE: Before changing the code, the simulator took:
-# 113555.607 ms
-# NOTE: Before changing Guard to not parse lines every time it took
-# 110783.375 ms
-# NOTE: After implementing the candidate test with multiprocessing w/ 4 workers took:
-# 54352.520 ms (2.04x speedup)
-# NOTE: After changing workers to 8 it took:
-# 53683.053 ms (1.01x speedup, from 4, 2.04x speedup from None)
-# Move run_candidate to top-level
-# NOTE: Reducing MAX_STEPS to 10**5 took:
-# 50088.752 ms (1.07x speedup from 10**6, 2.15x speedup from original)
-```
 
 ## Links
 
