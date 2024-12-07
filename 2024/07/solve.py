@@ -9,7 +9,7 @@ import math
 import pathlib
 from rich.console import Console
 import time
-from typing import Union, List, Optional, Tuple  # , Tuple, Dict, Literal, NewType
+from typing import Union, List, Optional, Dict  # , Tuple, Dict, Literal, NewType
 import sys
 
 console = Console()
@@ -21,7 +21,9 @@ cprint = console.print
 # Solver ID Constants
 DAY: str = "07"
 TITLE: str = "Bridge Repair"
-COMMENTS: str = """Put any extra comments for helper script here"""
+COMMENTS: str = """
+Interesting optimizations, otherwise standard dynamic programming (DP).
+Try another optimization where you don't track sequences, just whether they're possible"""
 
 # Types
 PathLike = Union[str, pathlib.Path]
@@ -159,16 +161,6 @@ def dp_recurse_memo(target: int, nums: List[int], idx: int, current: int) -> Lis
     """
     Memoized recursive function to find all sequences of '+' and '*' operations
     that transform the list of numbers into the target value.
-
-    Parameters:
-    - target (int): The desired target value.
-    - nums (List[int]): The list of numbers.
-    - idx (int): The current index in the list of numbers.
-    - current (int): The current accumulated value.
-
-    Returns:
-    - List[str]: A list of operation sequences that achieve the target.
-                 Each sequence is a string composed of '+' and '*' characters.
     """
 
     @functools.lru_cache(maxsize=None)
@@ -193,13 +185,45 @@ def dp_recurse_memo(target: int, nums: List[int], idx: int, current: int) -> Lis
         for seq in result_mul:
             sequences.append("*" + seq)
 
+        # Possibility 3: Concatenation
+        result_mul = recurse(idx + 1, int(str(current) + str(num_next)))
+        for seq in result_mul:
+            sequences.append("|" + seq)
+
         return tuple(sequences)  # Convert list to tuple for caching
 
     # Initiate recursion
     return list(recurse(idx, current))
 
 
+def dp_tabulation(target: int, nums: List[int]) -> List[str]:
+    if not nums:
+        return []
+    dp: List[Dict[int, List[str]]] = [{} for _ in range(len(nums) + 1)]
+    dp[1][nums[0]] = [""]
+
+    for i in range(1, len(nums)):
+        current_num = nums[i]
+        for acc_value, seq_list in dp[i].items():
+            new_value = acc_value + current_num
+            for seq in seq_list:
+                dp[i + 1].setdefault(new_value, []).append(seq + "+" + str(current_num))
+
+            new_value = acc_value * current_num
+            for seq in seq_list:
+                dp[i + 1].setdefault(new_value, []).append(seq + "*" + str(current_num))
+
+            new_value = int(str(acc_value) + str(current_num))
+            for seq in seq_list:
+                dp[i + 1].setdefault(new_value, []).append(seq + "|" + str(current_num))
+
+    return dp[-1].get(target, [])
+
+
 # NOTE: Naive recursion took 6034.204 ms for Part 2
+# NOTE: Memoized recursion took 10894.893 ms for Part 2 - I guess the overhead just is too much
+# NOTE: Tabulation took... 13744.930 ms for Part 2 - This bares investigation
+# NOTE: Try examining just checking if a sequence is possible don't track the sequence
 def part2(fpath: PathLike, debug: bool = False) -> int:
     # Parse again
     lines = [line for line in read_lines(fpath)]
