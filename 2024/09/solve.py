@@ -2,13 +2,7 @@
 import pathlib
 from rich.console import Console
 import time
-from typing import (
-    Union,
-    List,
-    Iterator,
-    Optional,
-    Tuple,
-)  # , Tuple, Dict, Literal, NewType, Optional
+from typing import Union, List, Tuple
 import sys
 
 cnsl = Console()
@@ -17,7 +11,12 @@ cprint = cnsl.print
 # Solver ID Constants
 DAY: str = "09"
 TITLE: str = "Disk Fragmenter"
-COMMENTS: str = """Check out the profiler, range(len - 1, -1, -1) is slow!"""
+COMMENTS: str = """
+Check out the profiler, range(len - 1, -1, -1) is slow!
+Lots of optimizations possible.
+Good place to try numpy or numba for speedups.
+And different data structures.
+"""
 
 # Types
 PathLike = Union[str, pathlib.Path]
@@ -45,7 +44,6 @@ def print_fs(fs: List[int]) -> None:
     cprint("")
 
 
-# TODO: Move profiling test to bottom with debug flag
 def next_free_old(fs: List[int], i: int) -> int:
     # NOTE: Holy shit reverse range() is slow if called thousands+ times
     for i in range(i, len(fs)):
@@ -55,14 +53,17 @@ def next_free_old(fs: List[int], i: int) -> int:
 
 
 def prior_data_old(fs: List[int], i: int) -> int:
-    for i in range(len(fs) - 1, -1, -1):
+    # NOTE: Is it len being called so much?
+    fslen = len(fs)
+    for i in range(fslen - 1, -1, -1):
         if fs[i] != -1:
             return i
     raise ValueError(f"No data found before {i}")
 
 
 def next_free(fs: List[int], i: int) -> int:
-    while i < len(fs):
+    fslen = len(fs)
+    while i < fslen:
         if fs[i] == -1:
             return i
         i += 1
@@ -94,19 +95,6 @@ def calc_checksum(fs: List[int]) -> int:
 
 
 def part1(fpath: PathLike, debug: bool = False) -> int:
-    """Steps to solve:
-    1. Parse input data to some data structure
-        - Input alternates between len of data blocks to len of freespace
-        - Must represent file order and/or ID
-        - Must represent length and/or position
-        - Fixed length, so maybe use nparray?
-        - How do you detect double digit blocks?
-    2. Move single data blocks from left to rightmost free space
-        - A helpful assertion might be to count freespace
-    3. Calculate checksum
-        - File block position (index) * block ID
-        - Each product is summed
-    """
     fs = read_fs(fpath)
 
     # Defrag
@@ -132,10 +120,11 @@ def find_last_file(fs: List[int], i_find: int) -> Tuple[int, int]:
 
 
 def find_free_space(fs: List[int], size: int) -> int:
+    lenfs = len(fs)
     i_free = next_free(fs, 0)
     i_data = i_free + 1
     while i_free + size >= i_data and i_free >= 0:
-        while i_data < len(fs) and fs[i_data] == -1:
+        while i_data < lenfs and fs[i_data] == -1:
             i_data += 1
         if i_data - i_free >= size:
             return i_free
@@ -253,31 +242,3 @@ if __name__ == "__main__":
         msg = "\nRunning profiler"
         cprint(msg, style="magenta")
         profile_index_funcs_in_defrag1(pathlib.Path(__file__).parent / "input.txt")
-
-# NOTE: First try at the defrag
-#     max_step = 10**6
-#     step = 0
-#     i_free = 0
-#     i_frag = len(fs) - 1
-#     while step < max_step and i_free < i_frag:
-#         step += 1
-#         if fs[i_frag] == -1:
-#             i_frag -= 1
-#         if fs[i_free] != -1:
-#             i_free += 1
-#         else:
-#             fs[i_free], fs[i_frag] = fs[i_frag], -1
-#             i_free += 1
-#             i_frag -= 1
-#             # if debug:
-#             #     print_fs(fs)
-#
-#     if free_space != fs.count(-1):
-#         cprint("Error: Free space count mismatch!", style="red")
-#         cprint(f"before: {free_space}, after: {fs.count(-1)})", style="red")
-#
-#     # Calculate checksum
-#     checksum = 0
-#     for i, id in enumerate(fs):
-#         if id != -1:
-#             checksum += i * id
