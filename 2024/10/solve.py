@@ -1,24 +1,24 @@
-# Disabled imports
-# import attrs
-# import dataclasses
-# import math
-# import re
-# import numpy as np
+from collections import deque as dq
+from collections import defaultdict as dd
 import pathlib
 import time
-from typing import Union, List  # , Tuple, Dict, Literal, NewType, Optional
+from typing import Union, List, Tuple, Set
+from rich.console import Console
 import sys
 
-# Util imports
-# from ..util.sols import cprint
+console = Console()
+cprint = console.print
 
 # Solver ID Constants
 DAY: str = "10"
 TITLE: str = "Hoof It"
-COMMENTS: str = """Put any extra comments for helper script here"""
+COMMENTS: str = """Not too bad once you figure out pathfinding is BFS traversal."""
 
 # Types
 PathLike = Union[str, pathlib.Path]
+Height = int
+Loc = Tuple[int, int]
+Map = List[List[Height]]
 
 
 def read_lines(fpath: PathLike) -> List[str]:
@@ -27,20 +27,117 @@ def read_lines(fpath: PathLike) -> List[str]:
     return lines
 
 
+def find_trailheads(map: Map) -> List[Loc]:
+    trailheads: List[Loc] = []
+    for r in range(len(map)):
+        for c in range(len(map[0])):
+            if map[r][c] == 0:
+                trailheads.append((r, c))
+    return trailheads
+
+
+def find_neighbors(map: Map, loc: Loc) -> List[Loc]:
+    """Find valid neighbors in cardinal directions."""
+    directions = [(-1, 0), (1, 0), (0, -1), (0, 1)]
+    r, c = loc
+    neighbors = []
+    for dr, dc in directions:
+        nr, nc = r + dr, c + dc
+        if 0 <= nr < len(map) and 0 <= nc < len(map[0]):
+            neighbors.append((nr, nc))
+    return neighbors
+
+
+def gradient_ascent(map: Map, trailhead: Loc) -> Set[Loc]:
+    """Given the list of heights, and start location, find all paths to peaks (9)"""
+    # Determine neigbors (cardinal directions)
+    q = dq([trailhead])
+    visited = set([trailhead])
+    peaks = set()
+
+    while q:
+        cur = q.popleft()
+        cur_h = map[cur[0]][cur[1]]
+
+        for n in find_neighbors(map, cur):
+            nr, nc = n
+            nh = map[nr][nc]
+            if n not in visited and nh == cur_h + 1:
+                visited.add(n)
+                q.append(n)
+                if nh == 9:
+                    peaks.add(n)
+    return peaks
+
+
 def part1(fpath: PathLike, debug: bool = False) -> int:
     lines = read_lines(fpath)
 
-    # TODO: Implement solution here
+    # Parse the map
+    map: Map = [[int(c) for c in line] for line in lines]
+    if debug:
+        cprint(map)
 
-    return 69
+    # Find all trailheads (height 0)
+    trailheads = find_trailheads(map)
+    if debug:
+        cprint(f"Trailheads: {trailheads}")
+
+    # Calculate scores for each trailhead
+    total_score = 0
+    for trailhead in trailheads:
+        peaks = gradient_ascent(map, trailhead)
+        if debug:
+            cprint(f"Trailhead {trailhead} can reach peaks: {peaks}")
+        total_score += len(peaks)
+
+    return total_score
+
+
+def unique_paths(map: Map, trailhead: Loc) -> int:
+    """Find all unique paths from a trailhead to peak (h = 9)"""
+    paths = dd(set)  # Store paths keyed by end location (r,c)
+    q = dq([(trailhead, [trailhead])])  # (Cur location, path so far)
+
+    while q:
+        cur, path = q.popleft()
+        cur_h = map[cur[0]][cur[1]]
+
+        for n in find_neighbors(map, cur):
+            nr, nc = n
+            nh = map[nr][nc]
+
+            if n not in path and nh == cur_h + 1:
+                new_path = path + [n]
+                if nh == 9:
+                    paths[n].add(tuple(new_path))
+                else:
+                    q.append((n, new_path))
+    return sum(len(paths[peak]) for peak in paths)
 
 
 def part2(fpath: PathLike, debug: bool = False) -> int:
     lines = read_lines(fpath)
 
-    # TODO: Implement solution here
+    # Parse the map
+    map: Map = [[int(c) for c in line] for line in lines]
+    if debug:
+        cprint(map)
 
-    return 420
+    # Find all trailheads (height 0)
+    trailheads = find_trailheads(map)
+    if debug:
+        cprint(f"Trailheads: {trailheads}")
+
+    # Calculate scores for each trailhead
+    total_score = 0
+    for trailhead in trailheads:
+        score = unique_paths(map, trailhead)
+        if debug:
+            cprint(f"Trailhead {trailhead} has score: {score}")
+        total_score += score
+
+    return total_score
 
 
 def bgrn(s) -> str:
