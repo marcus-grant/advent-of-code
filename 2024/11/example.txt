@@ -1,3 +1,1 @@
-!!! GO TO THE BELOW URL, highlight the example block's text & copy !!!
-https://adventofcode.com/2024/day/11
-!!! SELECT ALL TEXT IN THIS FILE, THEN PASTE, THEN SAVE !!!
+125 17
