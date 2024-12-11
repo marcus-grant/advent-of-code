@@ -1,13 +1,7 @@
-# Disabled imports
-# import attrs
-# import dataclasses
-# import math
-# import re
-# import numpy as np
-from collections import deque as dq
+from collections import defaultdict
 import pathlib
 import time
-from typing import Union, List, Deque, Tuple  # Dict, Literal, NewType, Optional
+from typing import Union, List, Dict
 from rich.console import Console
 import sys
 
@@ -17,63 +11,57 @@ cprint = Console().print
 # Solver ID Constants
 DAY: str = "11"
 TITLE: str = "Plutonian Pebbles"
-COMMENTS: str = """Put any extra comments for helper script here"""
+COMMENTS: str = """Sped up by many magnitudes on larger loops by using a map instead of Deque List."""
 
 # Types
 PathLike = Union[str, pathlib.Path]
 
 
-def read_lines(fpath: PathLike) -> List[str]:
-    with open(fpath, "r") as f:
-        lines = f.read().splitlines()
-    return lines
+def parse_stones(fpath: PathLike) -> Dict[int, int]:
+    stones_map = defaultdict(int)
+    for stone in open(fpath).read().split():
+        stones_map[int(stone)] += 1
+    return stones_map
 
 
-def parse_stones(fpath: PathLike) -> Deque[int]:
-    stones_str = read_lines(fpath)[0]
-    stones = dq([int(s) for s in stones_str.split()])
-    return stones
+def process_stone(stone: int) -> List[int]:
+    str_stone = str(stone)
+    len_stone = len(str_stone)
+    if stone == 0:
+        return [1]
+    elif len_stone % 2 == 0:
+        half = len(str_stone) // 2
+        stone1, stone2 = int(str_stone[:half]), int(str_stone[half:])
+        return [stone1, stone2]
+    else:
+        return [stone * 2024]
 
 
-def apply_rule2(stone_int: int) -> List[int]:
-    stone_str = str(stone_int)
-    mid = len(stone_str) // 2
-    left = int(stone_str[:mid]) if stone_str[:mid] else 0
-    right = int(stone_str[mid:]) if stone_str[mid:] else 0
-    return [left, right]
-
-
-def blink(stones: Deque[int]) -> Deque[int]:
-    new_stones = dq()
-    while stones:
-        stone = stones.popleft()
-        if stone == 0:  # Rule #1
-            new_stones.append(1)
-        elif len(str(stone)) % 2 == 0:  # Rule #2
-            new_stones.extend(apply_rule2(stone))
-        else:  # Rule #3
-            new_stones.append(stone * 2024)
-    return new_stones
+def blink(stones_map: Dict[int, int]) -> Dict[int, int]:
+    new_stones_map = defaultdict(int)
+    for stone, count in stones_map.items():
+        new_stones = process_stone(stone)
+        for new_stone in new_stones:
+            new_stones_map[new_stone] += count
+    return new_stones_map
 
 
 # NOTE: 334341 is too high your range was one too high for blink_count
 def part1(fpath: PathLike, debug: bool = False) -> int:
-    stones = parse_stones(fpath)
-    blink_count = 7 if "example" in str(fpath) else 25
-    for _ in range(blink_count):
-        if debug:
-            cprint(stones)
-        stones = blink(stones)
-
-    return len(stones)
+    stones_map = parse_stones(fpath)
+    for _ in range(25):
+        stones_map = blink(stones_map)
+    return sum(list(stones_map.values()))
 
 
 def part2(fpath: PathLike, debug: bool = False) -> int:
-    lines = read_lines(fpath)
-
-    # TODO: Implement solution here
-
-    return 420
+    stones_map = parse_stones(fpath)
+    for _ in range(75):
+        stones_map = blink(stones_map)
+    if debug:
+        cprint("\nAfter 75 blinks, there are this many unique stones:", end=" ")
+        cprint(len(stones_map), style="bold green")
+    return sum(list(stones_map.values()))
 
 
 def bgrn(s) -> str:
@@ -114,17 +102,11 @@ def run(debug: bool = False) -> None:
 
     # print(f"\n{bgrn('Part 2')}:\n")
 
-    # tstart = time.time()
-    # sol = part2(PATH_EX, **kw)
-    # ms = f"{1000 * (time.time() - tstart):.3f}"
-    # print(f"\n{mgta('Solution with Example Data:')}\t{bgrn(sol)}\n")
-    # print(blue(f"Time taken (ms):\t\t{ms}\n"))
-
-    # tstart = time.time()
-    # sol = part2(PATH_IN, **kw)
-    # ms = f"{1000 * (time.time() - tstart):.3f}"
-    # print(f"\n{mgta('Solution with Real Data:')}\t{bgrn(sol)}\n")
-    # print(blue(f"Time taken (ms):\t\t{ms}\n"))
+    tstart = time.time()
+    sol = part2(PATH_IN, **kw)
+    ms = f"{1000 * (time.time() - tstart):.3f}"
+    print(f"\n{mgta('Solution with Real Data:')}\t{bgrn(sol)}\n")
+    print(blue(f"Time taken (ms):\t\t{ms}\n"))
 
 
 if __name__ == "__main__":

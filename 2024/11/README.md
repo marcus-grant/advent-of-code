@@ -89,16 +89,12 @@ Consider the arrangement of stones in front of you.
 
 ## Part Two
 
-***PLACEHOLDER FOR TEXT BEFORE EXAMPLE***
+The Historians sure are taking a long time.
+To be fair, the infinite corridors **are** very large.
 
-```txt
-GO TO URL BELOW, COPY SECOND EXAMPLE TEXT, AND PASTE HERE
-https://adventofcode.com/2024/day/11
-```
+**How many stones would you have after blinking a total of `75` times?**
 
-***PLACEHOLDER FOR TEXT AFTER EXAMPLE***
-
-Your puzzle answer was *`PLACEHOLDER FOR VERIFIED INPUT ANSWER`*.
+Your puzzle answer was *`261936432123724`*.
 
 **Both parts of this puzzle are complete!
 They provide two gold stars: \*\***
@@ -122,4 +118,3 @@ you can [get your puzzle input][aoc-day11-input].
 [aoc-day11]: https://adventofcode.com/2024/day/11 "Advent of Code - Day 11"
 [aoc-day11-input]: https://adventofcode.com/2024/day/11/input "Advent of Code - Day 04 - Input"
 [aoc-2019-day20]: https://adventofcode.com/2019/day/20 "Advent of Code - 2019 - Day 20 - Plutonian Pebbles"
-
